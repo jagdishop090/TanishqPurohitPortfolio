@@ -30,3 +30,14 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Simplify animation on mobile */
+@media (max-width: 768px) {
+  .stair {
+    will-change: auto; /* Reduce GPU usage on mobile */
+  }
+  
+  #stairs {
+    perspective: 500px; /* Reduce 3D complexity */
+  }
+}

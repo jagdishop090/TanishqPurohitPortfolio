@@ -2,24 +2,27 @@ import { motion } from 'framer-motion'
 import './Contact.css'
 
 const Contact = () => {
+  // Simplified animations for mobile
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+  
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
+        staggerChildren: isMobile ? 0.05 : 0.1,
+        delayChildren: isMobile ? 0 : 0.2
       }
     }
   }
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: isMobile ? 0 : 20 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6,
+        duration: isMobile ? 0.3 : 0.6,
         ease: 'easeOut'
       }
     }

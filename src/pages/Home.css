@@ -155,6 +155,23 @@
   animation-delay: 1s;
 }
 
+/* Disable border animation on mobile */
+@media (max-width: 768px) {
+  .portrait-border-svg {
+    display: none; /* Hide animated border on mobile */
+  }
+  
+  .border-path {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .border-path {
+    animation: none !important;
+  }
+}
+
 @keyframes drawBorder {
   0% {
     stroke-dashoffset: 1200;
@@ -397,5 +414,11 @@
   .skill-icon {
     width: 24px;
     height: 24px;
+  }
+  
+  /* Disable hover effects on mobile */
+  .skill-card:hover {
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 }

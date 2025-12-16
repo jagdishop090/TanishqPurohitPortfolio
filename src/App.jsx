@@ -77,46 +77,50 @@ function App() {
         >
           <Home onNavigate={scrollToSection} />
         </section>
-        {activeSection === 'about' && (
-          <section 
-            id="about" 
-            ref={(el) => (sectionsRef.current.about = el)}
-          >
+        <section 
+          id="about" 
+          ref={(el) => (sectionsRef.current.about = el)}
+          style={{ display: activeSection === 'about' ? 'block' : 'none' }}
+        >
+          {activeSection === 'about' && (
             <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
               <About isAnimated={aboutAnimated && activeSection === 'about'} onNavigate={scrollToSection} />
             </Suspense>
-          </section>
-        )}
-        {activeSection === 'projects' && (
-          <section 
-            id="projects" 
-            ref={(el) => (sectionsRef.current.projects = el)}
-          >
+          )}
+        </section>
+        <section 
+          id="projects" 
+          ref={(el) => (sectionsRef.current.projects = el)}
+          style={{ display: activeSection === 'projects' ? 'block' : 'none' }}
+        >
+          {activeSection === 'projects' && (
             <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
               <Projects />
             </Suspense>
-          </section>
-        )}
-        {activeSection === 'skills' && (
-          <section 
-            id="skills" 
-            ref={(el) => (sectionsRef.current.skills = el)}
-          >
+          )}
+        </section>
+        <section 
+          id="skills" 
+          ref={(el) => (sectionsRef.current.skills = el)}
+          style={{ display: activeSection === 'skills' ? 'block' : 'none' }}
+        >
+          {activeSection === 'skills' && (
             <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
               <Skills />
             </Suspense>
-          </section>
-        )}
-        {activeSection === 'contact' && (
-          <section 
-            id="contact" 
-            ref={(el) => (sectionsRef.current.contact = el)}
-          >
+          )}
+        </section>
+        <section 
+          id="contact" 
+          ref={(el) => (sectionsRef.current.contact = el)}
+          style={{ display: activeSection === 'contact' ? 'block' : 'none' }}
+        >
+          {activeSection === 'contact' && (
             <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
               <Contact />
             </Suspense>
-          </section>
-        )}
+          )}
+        </section>
       </div>
       <Footer />
     </div>

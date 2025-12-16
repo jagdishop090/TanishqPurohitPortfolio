@@ -281,11 +281,10 @@ const ShooterGame = () => {
       )
     }
 
-    // Game loop - optimized
+    // Game loop - optimized for mobile
     let lastTime = 0
     let enemySpawnTimer = 0
-    let frameCount = 0
-    const targetFPS = 60
+    const targetFPS = isMobileRef.current ? 30 : 60 // Lower FPS on mobile
     const frameInterval = 1000 / targetFPS
 
     const gameLoop = (currentTime) => {

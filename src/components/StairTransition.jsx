@@ -55,24 +55,29 @@ const StairTransition = ({ isActive, nextPath, onComplete }) => {
       animationRef.current = null
     }
 
+    // Optimize for mobile
+    const isMobile = window.matchMedia('(max-width: 768px)').matches
+    const duration = isMobile ? 0.5 : 0.8
+    const staggerAmount = isMobile ? 0.3 : 0.5
+
     // Reset stairs position before animating with hardware acceleration
     window.gsap.set(stairElements, { 
       y: '100%',
-      force3D: true,
+      force3D: !isMobile, // Disable 3D on mobile for better performance
       transformOrigin: 'center center'
     })
 
     // Animate stairs down with optimized settings
     animationRef.current = window.gsap.to(stairElements, {
       y: '0%',
-      duration: 0.8,
+      duration: duration,
       stagger: {
-        amount: 0.5,
+        amount: staggerAmount,
         from: 'start',
-        ease: 'power2.out'
+        ease: isMobile ? 'power1.out' : 'power2.out'
       },
-      ease: 'power3.inOut',
-      force3D: true,
+      ease: isMobile ? 'power2.inOut' : 'power3.inOut',
+      force3D: !isMobile,
       lazy: false,
       onComplete: () => {
         if (onCompleteRef.current && nextPath) {
@@ -82,14 +87,14 @@ const StairTransition = ({ isActive, nextPath, onComplete }) => {
         timeoutRef.current = setTimeout(() => {
           animationRef.current = window.gsap.to(stairElements, {
             y: '100%',
-            duration: 0.8,
+            duration: duration,
             stagger: {
-              amount: 0.5,
+              amount: staggerAmount,
               from: 'end',
-              ease: 'power2.in'
+              ease: isMobile ? 'power1.in' : 'power2.in'
             },
-            ease: 'power3.inOut',
-            force3D: true,
+            ease: isMobile ? 'power2.inOut' : 'power3.inOut',
+            force3D: !isMobile,
             lazy: false,
             onComplete: () => {
               // Hide stairs container after animation completes
@@ -118,28 +123,32 @@ const StairTransition = ({ isActive, nextPath, onComplete }) => {
     }
   }, [isActive, nextPath, stairs.length])
 
-  // Reverse animation on mount (initial load)
+  // Reverse animation on mount (initial load) - optimized for mobile
   useEffect(() => {
     if (stairs.length > 0 && window.gsap && !hasAnimatedRef.current) {
       const stairElements = containerRef.current?.querySelectorAll('.stair')
       if (stairElements && stairElements.length > 0) {
         hasAnimatedRef.current = true
+        const isMobile = window.matchMedia('(max-width: 768px)').matches
+        const duration = isMobile ? 0.5 : 0.8
+        const staggerAmount = isMobile ? 0.3 : 0.5
+        
         window.gsap.fromTo(
           stairElements,
           { 
             y: '0%',
-            force3D: true
+            force3D: !isMobile
           },
           {
             y: '100%',
-            duration: 0.8,
+            duration: duration,
             stagger: {
-              amount: 0.5,
+              amount: staggerAmount,
               from: 'end',
-              ease: 'power2.in'
+              ease: isMobile ? 'power1.in' : 'power2.in'
             },
-            ease: 'power3.inOut',
-            force3D: true,
+            ease: isMobile ? 'power2.inOut' : 'power3.inOut',
+            force3D: !isMobile,
             lazy: false
           }
         )

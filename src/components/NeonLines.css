@@ -10,6 +10,19 @@
   opacity: 0.5;
 }
 
+/* Disable animations on mobile for better performance */
+@media (max-width: 768px) {
+  .neon-lines-container {
+    display: none; /* Hide completely on mobile */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neon-path {
+    animation: none !important;
+  }
+}
+
 .neon-lines-svg {
   width: 100%;
   height: 100%;
@@ -53,6 +66,19 @@
 .path-6 {
   animation: drawLine6 21s linear infinite, pulse6 4.5s ease-in-out infinite;
   animation-delay: 5s, 0s;
+}
+
+/* Disable animations on mobile */
+@media (max-width: 768px) {
+  .path-1,
+  .path-2,
+  .path-3,
+  .path-4,
+  .path-5,
+  .path-6 {
+    animation: none !important;
+    opacity: 0.3;
+  }
 }
 
 @keyframes drawLine1 {

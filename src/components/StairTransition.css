@@ -1,0 +1,32 @@
+#stairs {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.1s, visibility 0.1s;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+#stairs.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.stair {
+  position: absolute;
+  width: 120%;
+  height: 20%;
+  left: -10%;
+  background: var(--bg-light);
+  transform: translate3d(0, 100%, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

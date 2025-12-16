@@ -1,0 +1,255 @@
+import { useState, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
+import NeonLines from '../components/NeonLines'
+import './Home.css'
+
+const Home = ({ onNavigate }) => {
+  const portraitRef = useRef(null)
+  const rafRef = useRef(null)
+
+  useEffect(() => {
+    const portrait = portraitRef.current
+    if (!portrait) return
+
+    let tiltX = 0
+    let tiltY = 0
+    let targetX = 0
+    let targetY = 0
+
+    const updateTransform = () => {
+      // Smooth interpolation for better performance
+      tiltX += (targetX - tiltX) * 0.1
+      tiltY += (targetY - tiltY) * 0.1
+      
+      portrait.style.setProperty('--tilt-x', `${tiltX}deg`)
+      portrait.style.setProperty('--tilt-y', `${tiltY}deg`)
+      
+      if (Math.abs(targetX - tiltX) > 0.01 || Math.abs(targetY - tiltY) > 0.01) {
+        rafRef.current = requestAnimationFrame(updateTransform)
+      }
+    }
+
+    const handleMouseMove = (e) => {
+      const rect = portrait.getBoundingClientRect()
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+      
+      const x = (e.clientX - centerX) / (rect.width / 2)
+      const y = (e.clientY - centerY) / (rect.height / 2)
+      
+      // Limit tilt to reasonable angles (max 15 degrees)
+      targetX = x * 15
+      targetY = y * -15
+      
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(updateTransform)
+      }
+    }
+
+    const handleMouseLeave = () => {
+      targetX = 0
+      targetY = 0
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(updateTransform)
+      }
+    }
+
+    portrait.addEventListener('mousemove', handleMouseMove, { passive: true })
+    portrait.addEventListener('mouseleave', handleMouseLeave)
+
+    return () => {
+      portrait.removeEventListener('mousemove', handleMouseMove)
+      portrait.removeEventListener('mouseleave', handleMouseLeave)
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current)
+      }
+    }
+  }, [])
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: 'easeOut'
+      }
+    }
+  }
+
+  return (
+    <motion.div
+      className="home"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <NeonLines />
+      <div className="home-container">
+        <div className="home-content">
+          {/* Left Side - Text */}
+          <motion.div className="home-text" variants={itemVariants}>
+            <h1 className="home-title">
+              Hi, I'm Tanishq
+            </h1>
+            <p className="home-description">
+              I'm Tanishq Purohit, a passionate Designer, Software Developer, and Game Developer. I create digital experiences that combine creativity, functionality, and innovation.
+            </p>
+            <button 
+              className="home-cta-button"
+              onClick={() => onNavigate && onNavigate('contact')}
+            >
+              <span>CONTACT ME</span>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </motion.div>
+
+          {/* Right Side - Portrait */}
+          <motion.div className="home-portrait" variants={itemVariants}>
+            <div 
+              ref={portraitRef}
+              className="portrait-wrapper"
+            >
+              <svg className="portrait-border-svg" viewBox="0 0 320 400">
+                <defs>
+                  <filter id="portraitGlow">
+                    <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                  <linearGradient id="borderGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#00ffff" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#00ffff" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#00ffff" stopOpacity="0.8" />
+                  </linearGradient>
+                  <linearGradient id="borderGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#ff00ff" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#ff00ff" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#ff00ff" stopOpacity="0.8" />
+                  </linearGradient>
+                  <linearGradient id="borderGradient3" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#00ff88" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#00ff88" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#00ff88" stopOpacity="0.8" />
+                  </linearGradient>
+                  <linearGradient id="borderGradient4" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#ff0088" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#ff0088" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#ff0088" stopOpacity="0.8" />
+                  </linearGradient>
+                </defs>
+                {/* Rounded rectangle border path - following the border continuously */}
+                <path
+                  d="M 16,0 L 304,0 Q 320,0 320,16 L 320,384 Q 320,400 304,400 L 16,400 Q 0,400 0,384 L 0,16 Q 0,0 16,0 Z"
+                  fill="none"
+                  stroke="url(#borderGradient1)"
+                  strokeWidth="1.5"
+                  filter="url(#portraitGlow)"
+                  className="border-path path-1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M 16,0 L 304,0 Q 320,0 320,16 L 320,384 Q 320,400 304,400 L 16,400 Q 0,400 0,384 L 0,16 Q 0,0 16,0 Z"
+                  fill="none"
+                  stroke="url(#borderGradient2)"
+                  strokeWidth="1.5"
+                  filter="url(#portraitGlow)"
+                  className="border-path path-2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M 16,0 L 304,0 Q 320,0 320,16 L 320,384 Q 320,400 304,400 L 16,400 Q 0,400 0,384 L 0,16 Q 0,0 16,0 Z"
+                  fill="none"
+                  stroke="url(#borderGradient3)"
+                  strokeWidth="1.5"
+                  filter="url(#portraitGlow)"
+                  className="border-path path-3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M 16,0 L 304,0 Q 320,0 320,16 L 320,384 Q 320,400 304,400 L 16,400 Q 0,400 0,384 L 0,16 Q 0,0 16,0 Z"
+                  fill="none"
+                  stroke="url(#borderGradient4)"
+                  strokeWidth="1.5"
+                  filter="url(#portraitGlow)"
+                  className="border-path path-4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <div className="portrait-container">
+                <img 
+                  src="/portrait.jpg.png" 
+                  alt="Tanishq Purohit" 
+                  className="portrait-img"
+                />
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Skills Section */}
+        <motion.div className="home-skills" variants={itemVariants}>
+          <div className="skill-card skill-card-1">
+            <div className="skill-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <h3 className="skill-title">USER-CENTERED DESIGN</h3>
+          </div>
+          <div className="skill-card skill-card-2">
+            <div className="skill-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polyline points="16 18 22 12 16 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <polyline points="8 6 2 12 8 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <h3 className="skill-title">SOFTWARE DEVELOPMENT</h3>
+          </div>
+          <div className="skill-card skill-card-3">
+            <div className="skill-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" strokeWidth="2"/>
+                <path d="M6 10H6.01M10 10H10.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <h3 className="skill-title">GAME DEVELOPMENT</h3>
+          </div>
+          <div className="skill-card skill-card-4">
+            <div className="skill-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
+                <path d="M16 2L12 6L8 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <h3 className="skill-title">RESPONSIVE & MODERN</h3>
+          </div>
+        </motion.div>
+      </div>
+    </motion.div>
+  )
+}
+
+export default Home

@@ -1,0 +1,27 @@
+.app {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.content.transitioning {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.content section {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+}

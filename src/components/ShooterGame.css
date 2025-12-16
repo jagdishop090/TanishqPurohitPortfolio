@@ -1,0 +1,110 @@
+.shooter-game-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  overflow: visible;
+  background: var(--bg-light);
+  position: relative;
+}
+
+.shooter-game-canvas {
+  width: 100%;
+  max-width: 600px;
+  height: 400px;
+  border-radius: 10px;
+  cursor: crosshair;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-controls {
+  display: none;
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 20px;
+  padding: 0 20px;
+  pointer-events: none;
+  height: 120px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.joystick-container {
+  position: relative;
+  pointer-events: auto;
+  z-index: 1001;
+}
+
+.joystick-base {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid var(--text-dark);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  touch-action: none;
+  user-select: none;
+}
+
+.joystick-stick {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--text-dark);
+  position: absolute;
+  transition: transform 0.1s ease-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.jump-button {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid var(--text-dark);
+  color: var(--text-dark);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 1001;
+  flex-shrink: 0;
+}
+
+.jump-button:active {
+  transform: scale(0.95);
+  background: var(--text-dark);
+  color: var(--white);
+}
+
+@media (max-width: 768px) {
+  .shooter-game-container {
+    position: relative;
+    gap: 0;
+  }
+
+  .shooter-game-canvas {
+    height: 300px;
+    max-width: 100%;
+    touch-action: none;
+  }
+
+  .mobile-controls {
+    display: flex;
+  }
+}
+

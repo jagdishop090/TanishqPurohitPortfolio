@@ -1,0 +1,52 @@
+.custom-cursor {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  z-index: 99999;
+  left: 0;
+  top: 0;
+  transition: opacity 0.1s ease;
+  opacity: 0;
+  visibility: hidden;
+  will-change: left, top;
+  backface-visibility: hidden;
+  transform: rotate(-8deg);
+  transform-origin: center center;
+  contain: layout style paint;
+}
+
+/* Hide custom cursor on mobile/touch devices */
+@media (hover: none) or (pointer: coarse) {
+  .custom-cursor {
+    display: none;
+  }
+}
+
+.custom-cursor.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.cursor-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Hide default cursor on desktop only */
+@media (hover: hover) and (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  [role="button"],
+  [onclick] {
+    cursor: none !important;
+  }
+}
+

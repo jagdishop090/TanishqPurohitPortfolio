@@ -1,9 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
 import './MobilePopup.css'
 
-const MobilePopup = () => {
+const MobilePopup = forwardRef((props, ref) => {
   const [isVisible, setIsVisible] = useState(false)
   const [isDismissed, setIsDismissed] = useState(false)
+
+  useImperativeHandle(ref, () => ({
+    show: () => {
+      setIsVisible(true)
+      setIsDismissed(false)
+    }
+  }))
 
   useEffect(() => {
     // Check if mobile device
@@ -27,7 +34,7 @@ const MobilePopup = () => {
     localStorage.setItem('mobilePopupDismissed', 'true')
   }
 
-  if (!isVisible || isDismissed) return null
+  if (!isVisible) return null
 
   return (
     <div className="mobile-popup-overlay" onClick={handleDismiss}>
@@ -47,7 +54,9 @@ const MobilePopup = () => {
       </div>
     </div>
   )
-}
+})
+
+MobilePopup.displayName = 'MobilePopup'
 
 export default MobilePopup
 

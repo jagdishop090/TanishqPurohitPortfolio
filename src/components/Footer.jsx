@@ -18,6 +18,9 @@ const Footer = () => {
         <p className="footer-license">
           Licensed - All rights reserved to Tanishq Purohit
         </p>
+        <p className="footer-mobile-message">
+          For the best experience, view on desktop
+        </p>
       </div>
     </motion.footer>
   )

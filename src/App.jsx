@@ -5,6 +5,7 @@ import DynamicBackground from './components/DynamicBackground'
 import StairTransition from './components/StairTransition'
 import CustomCursor from './components/CustomCursor'
 import MobilePopup from './components/MobilePopup'
+import FloatingWarning from './components/FloatingWarning'
 import Home from './pages/Home'
 import './App.css'
 
@@ -21,6 +22,7 @@ function App() {
   const [aboutAnimated, setAboutAnimated] = useState(false)
   const sectionsRef = useRef({})
   const lastTriggeredTime = useRef(0)
+  const mobilePopupRef = useRef(null)
 
   const handleStairComplete = (sectionId) => {
     if (!sectionId) return
@@ -60,9 +62,16 @@ function App() {
     }
   }, [])
 
+  const handleShowPopup = useCallback(() => {
+    if (mobilePopupRef.current) {
+      mobilePopupRef.current.show()
+    }
+  }, [])
+
   return (
     <div className="app">
-      <MobilePopup />
+      <MobilePopup ref={mobilePopupRef} />
+      <FloatingWarning onShowPopup={handleShowPopup} />
       <CustomCursor />
       <DynamicBackground />
       <Header activeSection={activeSection} onNavigate={scrollToSection} />

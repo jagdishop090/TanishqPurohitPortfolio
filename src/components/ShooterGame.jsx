@@ -281,15 +281,25 @@ const ShooterGame = () => {
       )
     }
 
-    // Game loop
+    // Game loop - optimized
     let lastTime = 0
     let enemySpawnTimer = 0
+    let frameCount = 0
+    const targetFPS = 60
+    const frameInterval = 1000 / targetFPS
 
     const gameLoop = (currentTime) => {
       if (!gameRef.current) return
 
       const deltaTime = currentTime - lastTime
-      lastTime = currentTime
+      
+      // Throttle to target FPS for better performance
+      if (deltaTime < frameInterval) {
+        requestAnimationFrame(gameLoop)
+        return
+      }
+      
+      lastTime = currentTime - (deltaTime % frameInterval)
 
       // Clear canvas
       ctx.fillStyle = '#dadbd4'
@@ -498,9 +508,14 @@ const ShooterGame = () => {
     }
 
     setIsPlaying(true)
-    gameLoop(0)
+    const animationId = requestAnimationFrame(gameLoop)
+    gameRef.current.animationId = animationId
 
     return () => {
+      // Cancel animation frame
+      if (gameRef.current?.animationId) {
+        cancelAnimationFrame(gameRef.current.animationId)
+      }
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
       canvas.removeEventListener('click', handleClick)

@@ -1,6 +1,7 @@
+import { memo } from 'react'
 import './NeonLines.css'
 
-const NeonLines = () => {
+const NeonLines = memo(() => {
   return (
     <div className="neon-lines-container">
       <svg
@@ -100,7 +101,9 @@ const NeonLines = () => {
       </svg>
     </div>
   )
-}
+})
+
+NeonLines.displayName = 'NeonLines'
 
 export default NeonLines
 

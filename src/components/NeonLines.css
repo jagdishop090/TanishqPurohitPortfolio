@@ -21,6 +21,9 @@
 .neon-path {
   stroke-dasharray: 150;
   stroke-dashoffset: 150;
+  will-change: stroke-dashoffset, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .path-1 {

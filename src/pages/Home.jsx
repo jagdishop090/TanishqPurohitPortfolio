@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, memo, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import NeonLines from '../components/NeonLines'
 import './Home.css'
 
-const Home = ({ onNavigate }) => {
+const Home = memo(({ onNavigate }) => {
   const portraitRef = useRef(null)
   const rafRef = useRef(null)
 
@@ -250,6 +250,8 @@ const Home = ({ onNavigate }) => {
       </div>
     </motion.div>
   )
-}
+})
+
+Home.displayName = 'Home'
 
 export default Home

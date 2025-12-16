@@ -9,9 +9,9 @@
   transition: opacity 0.1s ease;
   opacity: 0;
   visibility: hidden;
-  will-change: left, top;
+  will-change: transform;
   backface-visibility: hidden;
-  transform: rotate(-8deg);
+  transform: translate(0, 0) rotate(-8deg);
   transform-origin: center center;
   contain: layout style paint;
 }

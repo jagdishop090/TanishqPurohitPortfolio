@@ -1,9 +1,11 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, memo } from 'react'
 import './CustomCursor.css'
 
-const CustomCursor = () => {
+const CustomCursor = memo(() => {
   const [isVisible, setIsVisible] = useState(false)
   const cursorRef = useRef(null)
+  const rafRef = useRef(null)
+  const lastUpdateRef = useRef(0)
 
   useEffect(() => {
     // Only show custom cursor on devices that support hover (desktop)
@@ -12,13 +14,24 @@ const CustomCursor = () => {
     }
 
     const updateCursor = (e) => {
-      if (cursorRef.current) {
-        const offset = 8
-        // Direct update for zero latency
-        cursorRef.current.style.left = `${e.clientX - offset}px`
-        cursorRef.current.style.top = `${e.clientY - offset}px`
+      // Throttle updates using requestAnimationFrame
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current)
       }
-      setIsVisible(true)
+
+      rafRef.current = requestAnimationFrame(() => {
+        const now = performance.now()
+        // Throttle to ~60fps
+        if (now - lastUpdateRef.current < 16) return
+        lastUpdateRef.current = now
+
+        if (cursorRef.current) {
+          const offset = 8
+          // Use transform for better performance
+          cursorRef.current.style.transform = `translate(${e.clientX - offset}px, ${e.clientY - offset}px)`
+        }
+        setIsVisible(true)
+      })
     }
 
     const handleMouseEnter = () => setIsVisible(true)
@@ -29,6 +42,9 @@ const CustomCursor = () => {
     document.addEventListener('mouseleave', handleMouseLeave)
 
     return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current)
+      }
       window.removeEventListener('mousemove', updateCursor)
       document.removeEventListener('mouseenter', handleMouseEnter)
       document.removeEventListener('mouseleave', handleMouseLeave)
@@ -59,7 +75,9 @@ const CustomCursor = () => {
       </svg>
     </div>
   )
-}
+})
+
+CustomCursor.displayName = 'CustomCursor'
 
 export default CustomCursor
 

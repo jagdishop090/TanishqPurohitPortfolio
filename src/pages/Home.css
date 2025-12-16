@@ -131,6 +131,9 @@
 .border-path {
   stroke-dasharray: 1200;
   stroke-dashoffset: 1200;
+  will-change: stroke-dashoffset;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .border-path.path-1 {

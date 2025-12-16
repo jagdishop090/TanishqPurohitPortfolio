@@ -1,15 +1,17 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import DynamicBackground from './components/DynamicBackground'
 import StairTransition from './components/StairTransition'
 import CustomCursor from './components/CustomCursor'
 import Home from './pages/Home'
-import About from './pages/About'
-import Projects from './pages/Projects'
-import Skills from './pages/Skills'
-import Contact from './pages/Contact'
 import './App.css'
+
+// Lazy load pages that aren't immediately visible
+const About = lazy(() => import('./pages/About'))
+const Projects = lazy(() => import('./pages/Projects'))
+const Skills = lazy(() => import('./pages/Skills'))
+const Contact = lazy(() => import('./pages/Contact'))
 
 function App() {
   const [activeSection, setActiveSection] = useState('home')
@@ -49,13 +51,13 @@ function App() {
     setNextPath(sectionId)
   }
 
-  const scrollToSection = (sectionId) => {
+  const scrollToSection = useCallback((sectionId) => {
     const element = sectionsRef.current[sectionId]
     if (element) {
       // Trigger stair animation
       triggerStairAnimation(sectionId)
     }
-  }
+  }, [])
 
   return (
     <div className="app">
@@ -75,34 +77,46 @@ function App() {
         >
           <Home onNavigate={scrollToSection} />
         </section>
-        <section 
-          id="about" 
-          ref={(el) => (sectionsRef.current.about = el)}
-          style={{ display: activeSection === 'about' ? 'block' : 'none' }}
-        >
-          <About isAnimated={aboutAnimated && activeSection === 'about'} onNavigate={scrollToSection} />
-        </section>
-        <section 
-          id="projects" 
-          ref={(el) => (sectionsRef.current.projects = el)}
-          style={{ display: activeSection === 'projects' ? 'block' : 'none' }}
-        >
-          <Projects />
-        </section>
-        <section 
-          id="skills" 
-          ref={(el) => (sectionsRef.current.skills = el)}
-          style={{ display: activeSection === 'skills' ? 'block' : 'none' }}
-        >
-          <Skills />
-        </section>
-        <section 
-          id="contact" 
-          ref={(el) => (sectionsRef.current.contact = el)}
-          style={{ display: activeSection === 'contact' ? 'block' : 'none' }}
-        >
-          <Contact />
-        </section>
+        {activeSection === 'about' && (
+          <section 
+            id="about" 
+            ref={(el) => (sectionsRef.current.about = el)}
+          >
+            <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
+              <About isAnimated={aboutAnimated && activeSection === 'about'} onNavigate={scrollToSection} />
+            </Suspense>
+          </section>
+        )}
+        {activeSection === 'projects' && (
+          <section 
+            id="projects" 
+            ref={(el) => (sectionsRef.current.projects = el)}
+          >
+            <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
+              <Projects />
+            </Suspense>
+          </section>
+        )}
+        {activeSection === 'skills' && (
+          <section 
+            id="skills" 
+            ref={(el) => (sectionsRef.current.skills = el)}
+          >
+            <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
+              <Skills />
+            </Suspense>
+          </section>
+        )}
+        {activeSection === 'contact' && (
+          <section 
+            id="contact" 
+            ref={(el) => (sectionsRef.current.contact = el)}
+          >
+            <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
+              <Contact />
+            </Suspense>
+          </section>
+        )}
       </div>
       <Footer />
     </div>

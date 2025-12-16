@@ -17,6 +17,11 @@
   border-radius: 10px;
   cursor: crosshair;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  image-rendering: optimizeSpeed;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  will-change: contents;
 }
 
 .mobile-controls {

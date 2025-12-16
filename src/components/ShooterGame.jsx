@@ -145,12 +145,37 @@ const ShooterGame = () => {
       const touch = e.touches[0]
       if (!touch) return
       
+      const touchX = touch.clientX
+      const touchY = touch.clientY
+      
+      // Check for game over restart first
+      if (game.gameOver) {
+        const rect = canvas.getBoundingClientRect()
+        if (
+          touchX >= rect.left &&
+          touchX <= rect.right &&
+          touchY >= rect.top &&
+          touchY <= rect.bottom
+        ) {
+          e.preventDefault()
+          e.stopPropagation()
+          // Reset game
+          game.player.x = 50
+          game.player.y = 300
+          game.player.velocityY = 0
+          game.bullets = []
+          game.enemies = []
+          game.score = 0
+          game.gameOver = false
+          setIsPlaying(true)
+          return
+        }
+      }
+      
       activeTouchId = touch.identifier
       
       if (joystickBase) {
         joystickBaseRect = joystickBase.getBoundingClientRect()
-        const touchX = touch.clientX
-        const touchY = touch.clientY
         
         // Check if touch is on joystick base
         const baseCenterX = joystickBaseRect.left + joystickBaseRect.width / 2
@@ -177,10 +202,10 @@ const ShooterGame = () => {
       if (jumpButton) {
         const jumpRect = jumpButton.getBoundingClientRect()
         if (
-          touch.clientX >= jumpRect.left - 10 &&
-          touch.clientX <= jumpRect.right + 10 &&
-          touch.clientY >= jumpRect.top - 10 &&
-          touch.clientY <= jumpRect.bottom + 10
+          touchX >= jumpRect.left - 10 &&
+          touchX <= jumpRect.right + 10 &&
+          touchY >= jumpRect.top - 10 &&
+          touchY <= jumpRect.bottom + 10
         ) {
           e.preventDefault()
           e.stopPropagation()
@@ -193,30 +218,57 @@ const ShooterGame = () => {
         }
       }
       
-      // Shoot at touch position (on canvas)
+      // Shoot at touch position (on canvas) - exclude joystick and jump button areas
       const rect = canvas.getBoundingClientRect()
+      
+      // Check if touch is within canvas bounds
       if (
-        touch.clientX >= rect.left &&
-        touch.clientX <= rect.right &&
-        touch.clientY >= rect.top &&
-        touch.clientY <= rect.bottom
+        touchX >= rect.left &&
+        touchX <= rect.right &&
+        touchY >= rect.top &&
+        touchY <= rect.bottom
       ) {
-        e.preventDefault()
-        const mouseX = touch.clientX - rect.left
-        const mouseY = touch.clientY - rect.top
+        // Make sure we're not touching joystick or jump button area
+        const isOnJoystick = joystickBase && joystickBaseRect && 
+          Math.sqrt(
+            Math.pow(touchX - (joystickBaseRect.left + joystickBaseRect.width / 2), 2) + 
+            Math.pow(touchY - (joystickBaseRect.top + joystickBaseRect.height / 2), 2)
+          ) <= joystickBaseRect.width / 2 + 30
         
-        const angle = Math.atan2(
-          mouseY - (game.player.y + game.player.height / 2),
-          mouseX - (game.player.x + game.player.width / 2)
-        )
+        const isOnJumpButton = jumpButton && 
+          touchX >= jumpButton.getBoundingClientRect().left - 10 &&
+          touchX <= jumpButton.getBoundingClientRect().right + 10 &&
+          touchY >= jumpButton.getBoundingClientRect().top - 10 &&
+          touchY <= jumpButton.getBoundingClientRect().bottom + 10
         
-        game.bullets.push({
-          x: game.player.x + game.player.width / 2,
-          y: game.player.y + game.player.height / 2,
-          vx: Math.cos(angle) * 8,
-          vy: Math.sin(angle) * 8,
-          radius: 4
-        })
+        if (!isOnJoystick && !isOnJumpButton) {
+          e.preventDefault()
+          e.stopPropagation()
+          
+          // Convert screen coordinates to canvas coordinates
+          // Account for canvas scaling
+          const scaleX = canvas.width / rect.width
+          const scaleY = canvas.height / rect.height
+          const canvasX = (touchX - rect.left) * scaleX
+          const canvasY = (touchY - rect.top) * scaleY
+          
+          // Calculate angle using canvas coordinates
+          const playerCenterX = game.player.x + game.player.width / 2
+          const playerCenterY = game.player.y + game.player.height / 2
+          
+          const angle = Math.atan2(
+            canvasY - playerCenterY,
+            canvasX - playerCenterX
+          )
+          
+          game.bullets.push({
+            x: playerCenterX,
+            y: playerCenterY,
+            vx: Math.cos(angle) * 8,
+            vy: Math.sin(angle) * 8,
+            radius: 4
+          })
+        }
       }
     }
 
@@ -256,11 +308,12 @@ const ShooterGame = () => {
     window.addEventListener('keyup', handleKeyUp)
     canvas.addEventListener('click', handleClick)
     
-      if (isMobileRef.current && container) {
-        container.addEventListener('touchstart', handleTouchStart, { passive: false })
-        container.addEventListener('touchmove', handleTouchMove, { passive: false })
-        container.addEventListener('touchend', handleTouchEnd, { passive: false })
-      }
+    // Mobile touch handlers
+    if (isMobileRef.current && container) {
+      container.addEventListener('touchstart', handleTouchStart, { passive: false })
+      container.addEventListener('touchmove', handleTouchMove, { passive: false })
+      container.addEventListener('touchend', handleTouchEnd, { passive: false })
+    }
 
     // Collision detection
     const checkCollision = (rect1, rect2) => {
@@ -492,7 +545,8 @@ const ShooterGame = () => {
         ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 20)
         ctx.font = '18px Inter, sans-serif'
         ctx.fillText(`Final Score: ${game.score}`, canvas.width / 2, canvas.height / 2 + 20)
-        ctx.fillText('Click to Restart', canvas.width / 2, canvas.height / 2 + 50)
+        const restartText = isMobileRef.current ? 'Tap to Restart' : 'Click to Restart'
+        ctx.fillText(restartText, canvas.width / 2, canvas.height / 2 + 50)
         ctx.textAlign = 'left'
       } else {
         ctx.fillStyle = '#666666'

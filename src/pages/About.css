@@ -195,6 +195,57 @@
   width: 100%;
 }
 
+/* Desktop Resolution Optimizations */
+@media (min-width: 1920px) {
+  .about-container {
+    max-width: 1600px;
+  }
+
+  .about {
+    padding: 10rem 4rem 2rem;
+  }
+
+  .about-content,
+  .process-content {
+    gap: 4rem;
+  }
+
+  .about-title {
+    font-size: 3.2rem;
+  }
+
+  .process-title {
+    font-size: 2.8rem;
+  }
+}
+
+@media (min-width: 2560px) {
+  .about-container {
+    max-width: 1800px;
+  }
+
+  .about {
+    padding: 12rem 5rem 2rem;
+  }
+
+  .about-content,
+  .process-content {
+    gap: 5rem;
+  }
+
+  .about-title {
+    font-size: 3.6rem;
+  }
+
+  .process-title {
+    font-size: 3.2rem;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+  }
+}
+
 @media (max-width: 1200px) {
   .about-content,
   .process-content {

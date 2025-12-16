@@ -98,6 +98,59 @@
   will-change: width;
 }
 
+/* Desktop Resolution Optimizations */
+@media (min-width: 1920px) {
+  .skills-container {
+    max-width: 1600px;
+  }
+
+  .skills {
+    padding: 10rem 4rem 4rem;
+  }
+
+  .page-title {
+    font-size: 3.2rem;
+  }
+
+  .skills-grid {
+    gap: 2.5rem;
+  }
+
+  .skill-category {
+    padding: 2.5rem;
+  }
+
+  .category-title {
+    font-size: 1.6rem;
+  }
+}
+
+@media (min-width: 2560px) {
+  .skills-container {
+    max-width: 1800px;
+  }
+
+  .skills {
+    padding: 12rem 5rem 4rem;
+  }
+
+  .page-title {
+    font-size: 3.6rem;
+  }
+
+  .skills-grid {
+    gap: 3rem;
+  }
+
+  .skill-category {
+    padding: 3rem;
+  }
+
+  .category-title {
+    font-size: 1.8rem;
+  }
+}
+
 @media (max-width: 1200px) {
   .skills-grid {
     grid-template-columns: repeat(2, 1fr);

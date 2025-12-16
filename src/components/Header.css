@@ -116,6 +116,63 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
+/* Desktop Resolution Optimizations */
+@media (min-width: 1920px) {
+  .header-content {
+    max-width: 1800px;
+  }
+
+  .header {
+    padding: 1.5rem 4rem;
+  }
+
+  .header.scrolled {
+    padding: 1.2rem 4rem;
+  }
+
+  .logo-text {
+    font-size: 1.7rem;
+  }
+
+  .nav-item {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.8rem;
+  }
+
+  .header-contact-btn {
+    padding: 0.8rem 2rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 2560px) {
+  .header-content {
+    max-width: 2000px;
+  }
+
+  .header {
+    padding: 2rem 5rem;
+  }
+
+  .header.scrolled {
+    padding: 1.5rem 5rem;
+  }
+
+  .logo-text {
+    font-size: 1.9rem;
+  }
+
+  .nav-item {
+    padding: 0.8rem 1.8rem;
+    font-size: 0.85rem;
+  }
+
+  .header-contact-btn {
+    padding: 0.9rem 2.5rem;
+    font-size: 0.85rem;
+  }
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
   .header {

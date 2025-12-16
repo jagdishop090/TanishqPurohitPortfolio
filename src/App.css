@@ -25,3 +25,16 @@
   width: 100%;
   position: relative;
 }
+
+/* Desktop Resolution Optimizations */
+@media (min-width: 1920px) {
+  .app {
+    font-size: 1.05em;
+  }
+}
+
+@media (min-width: 2560px) {
+  .app {
+    font-size: 1.1em;
+  }
+}

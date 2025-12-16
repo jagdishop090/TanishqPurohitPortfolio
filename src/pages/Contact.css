@@ -66,6 +66,53 @@
   transform: translateY(-2px);
 }
 
+/* Desktop Resolution Optimizations */
+@media (min-width: 1920px) {
+  .contact-container {
+    max-width: 1000px;
+  }
+
+  .contact {
+    padding: 10rem 4rem 4rem;
+  }
+
+  .page-title {
+    font-size: 3.2rem;
+  }
+
+  .contact-card {
+    padding: 4rem;
+    max-width: 600px;
+  }
+
+  .contact-value {
+    font-size: 1.3rem;
+  }
+}
+
+@media (min-width: 2560px) {
+  .contact-container {
+    max-width: 1200px;
+  }
+
+  .contact {
+    padding: 12rem 5rem 4rem;
+  }
+
+  .page-title {
+    font-size: 3.6rem;
+  }
+
+  .contact-card {
+    padding: 5rem;
+    max-width: 700px;
+  }
+
+  .contact-value {
+    font-size: 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
   .contact {
     padding: 8rem 2rem 4rem;

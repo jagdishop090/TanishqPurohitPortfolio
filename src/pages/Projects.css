@@ -216,6 +216,53 @@
   border-radius: 50%;
 }
 
+/* Desktop Resolution Optimizations */
+@media (min-width: 1920px) {
+  .projects-container {
+    max-width: 1600px;
+  }
+
+  .projects {
+    padding: 10rem 4rem 4rem;
+  }
+
+  .projects-title {
+    font-size: 3.5rem;
+  }
+
+  .project-card {
+    max-width: 1200px;
+    padding: 3rem;
+  }
+
+  .project-title {
+    font-size: 2.8rem;
+  }
+}
+
+@media (min-width: 2560px) {
+  .projects-container {
+    max-width: 1800px;
+  }
+
+  .projects {
+    padding: 12rem 5rem 4rem;
+  }
+
+  .projects-title {
+    font-size: 4rem;
+  }
+
+  .project-card {
+    max-width: 1400px;
+    padding: 3.5rem;
+  }
+
+  .project-title {
+    font-size: 3.2rem;
+  }
+}
+
 @media (max-width: 968px) {
   .projects {
     padding: 8rem 2rem 4rem;

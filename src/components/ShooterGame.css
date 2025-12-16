@@ -96,6 +96,21 @@
   color: var(--white);
 }
 
+/* Desktop Resolution Optimizations */
+@media (min-width: 1920px) {
+  .shooter-game-canvas {
+    max-width: 700px;
+    height: 450px;
+  }
+}
+
+@media (min-width: 2560px) {
+  .shooter-game-canvas {
+    max-width: 800px;
+    height: 500px;
+  }
+}
+
 @media (max-width: 768px) {
   .shooter-game-container {
     position: relative;

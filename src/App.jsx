@@ -4,6 +4,7 @@ import Footer from './components/Footer'
 import DynamicBackground from './components/DynamicBackground'
 import StairTransition from './components/StairTransition'
 import CustomCursor from './components/CustomCursor'
+import MobilePopup from './components/MobilePopup'
 import Home from './pages/Home'
 import './App.css'
 
@@ -61,6 +62,7 @@ function App() {
 
   return (
     <div className="app">
+      <MobilePopup />
       <CustomCursor />
       <DynamicBackground />
       <Header activeSection={activeSection} onNavigate={scrollToSection} />

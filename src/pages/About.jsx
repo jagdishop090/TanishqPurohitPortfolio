@@ -70,7 +70,7 @@ const About = ({ isAnimated, onNavigate }) => {
       className="about"
       variants={containerVariants}
       initial="hidden"
-      animate={isAnimated !== false ? "visible" : "hidden"}
+      animate="visible"
     >
       <div className="about-container">
         <div className="about-content">

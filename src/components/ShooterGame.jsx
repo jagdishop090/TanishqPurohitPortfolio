@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import './ShooterGame.css'
 
 const ShooterGame = () => {
@@ -11,6 +11,119 @@ const ShooterGame = () => {
   const [isMobile, setIsMobile] = useState(false)
   const [isMovingLeft, setIsMovingLeft] = useState(false)
   const [isMovingRight, setIsMovingRight] = useState(false)
+  // Use refs for movement state to avoid re-renders
+  const movingLeftRef = useRef(false)
+  const movingRightRef = useRef(false)
+
+  // Mobile button handlers - defined outside useEffect so they can be used in JSX
+  const handleLeftPress = useCallback((e) => {
+    if (e) {
+      // Only preventDefault if event is cancelable (not passive)
+      if (e.cancelable !== false) {
+        try {
+          e.preventDefault()
+        } catch (err) {
+          // Ignore if preventDefault fails (passive listener)
+        }
+      }
+      if (typeof e.stopPropagation === 'function') {
+        e.stopPropagation()
+      }
+    }
+    setIsMovingLeft(true)
+    movingLeftRef.current = true
+    // Also update game object directly for immediate response
+    if (gameRef.current) {
+      gameRef.current.movingLeft = true
+    }
+  }, [])
+
+  const handleLeftRelease = useCallback((e) => {
+    if (e) {
+      // Only preventDefault if event is cancelable (not passive)
+      if (e.cancelable !== false) {
+        try {
+          e.preventDefault()
+        } catch (err) {
+          // Ignore if preventDefault fails (passive listener)
+        }
+      }
+      if (typeof e.stopPropagation === 'function') {
+        e.stopPropagation()
+      }
+    }
+    setIsMovingLeft(false)
+    movingLeftRef.current = false
+    // Also update game object directly
+    if (gameRef.current) {
+      gameRef.current.movingLeft = false
+    }
+  }, [])
+
+  const handleRightPress = useCallback((e) => {
+    if (e) {
+      // Only preventDefault if event is cancelable (not passive)
+      if (e.cancelable !== false) {
+        try {
+          e.preventDefault()
+        } catch (err) {
+          // Ignore if preventDefault fails (passive listener)
+        }
+      }
+      if (typeof e.stopPropagation === 'function') {
+        e.stopPropagation()
+      }
+    }
+    setIsMovingRight(true)
+    movingRightRef.current = true
+    // Also update game object directly for immediate response
+    if (gameRef.current) {
+      gameRef.current.movingRight = true
+    }
+  }, [])
+
+  const handleRightRelease = useCallback((e) => {
+    if (e) {
+      // Only preventDefault if event is cancelable (not passive)
+      if (e.cancelable !== false) {
+        try {
+          e.preventDefault()
+        } catch (err) {
+          // Ignore if preventDefault fails (passive listener)
+        }
+      }
+      if (typeof e.stopPropagation === 'function') {
+        e.stopPropagation()
+      }
+    }
+    setIsMovingRight(false)
+    movingRightRef.current = false
+    // Also update game object directly
+    if (gameRef.current) {
+      gameRef.current.movingRight = false
+    }
+  }, [])
+
+  const handleJump = useCallback((e) => {
+    if (e) {
+      // Only preventDefault if event is cancelable (not passive)
+      if (e.cancelable !== false) {
+        try {
+          e.preventDefault()
+        } catch (err) {
+          // Ignore if preventDefault fails (passive listener)
+        }
+      }
+      if (typeof e.stopPropagation === 'function') {
+        e.stopPropagation()
+      }
+    }
+    const game = gameRef.current
+    if (game && (game.player.onGround || game.player.velocityY <= 1)) {
+      game.player.velocityY = -game.player.jumpPower
+      game.player.onGround = false
+    }
+  }, [])
 
   useEffect(() => {
     // Check if mobile device
@@ -52,7 +165,9 @@ const ShooterGame = () => {
       ],
       keys: {},
       score: 0,
-      gameOver: false
+      gameOver: false,
+      movingLeft: false,
+      movingRight: false
     }
 
     gameRef.current = game
@@ -83,7 +198,13 @@ const ShooterGame = () => {
         game.enemies = []
         game.score = 0
         game.gameOver = false
+        game.movingLeft = false
+        game.movingRight = false
+        movingLeftRef.current = false
+        movingRightRef.current = false
         setIsPlaying(true)
+        setIsMovingLeft(false)
+        setIsMovingRight(false)
         return
       }
 
@@ -108,50 +229,7 @@ const ShooterGame = () => {
       })
     }
 
-    // Mobile button handlers
-    const handleLeftPress = (e) => {
-      if (e) {
-        e.preventDefault()
-        e.stopPropagation()
-      }
-      setIsMovingLeft(true)
-    }
-
-    const handleLeftRelease = (e) => {
-      if (e) {
-        e.preventDefault()
-        e.stopPropagation()
-      }
-      setIsMovingLeft(false)
-    }
-
-    const handleRightPress = (e) => {
-      if (e) {
-        e.preventDefault()
-        e.stopPropagation()
-      }
-      setIsMovingRight(true)
-    }
-
-    const handleRightRelease = (e) => {
-      if (e) {
-        e.preventDefault()
-        e.stopPropagation()
-      }
-      setIsMovingRight(false)
-    }
-
-    const handleJump = (e) => {
-      if (e) {
-        e.preventDefault()
-        e.stopPropagation()
-      }
-      // Allow jump if on ground or very close to ground (small buffer for better feel)
-      if (game.player.onGround || game.player.velocityY <= 1) {
-        game.player.velocityY = -game.player.jumpPower
-        game.player.onGround = false
-      }
-    }
+    // Mobile button handlers are now defined outside useEffect using useCallback
 
     // Touch shooting
     const handleCanvasTouch = (e) => {
@@ -164,14 +242,29 @@ const ShooterGame = () => {
         game.enemies = []
         game.score = 0
         game.gameOver = false
+        game.movingLeft = false
+        game.movingRight = false
+        movingLeftRef.current = false
+        movingRightRef.current = false
         setIsPlaying(true)
+        setIsMovingLeft(false)
+        setIsMovingRight(false)
         return
       }
       
       if (!isPlaying) return
       
-      e.preventDefault()
-      e.stopPropagation()
+      // Only preventDefault if event is cancelable (not passive)
+      if (e.cancelable !== false) {
+        try {
+          e.preventDefault()
+        } catch (err) {
+          // Ignore if preventDefault fails (passive listener)
+        }
+      }
+      if (typeof e.stopPropagation === 'function') {
+        e.stopPropagation()
+      }
       
       if (!e.touches || e.touches.length === 0) return
       const touch = e.touches[0]
@@ -212,13 +305,31 @@ const ShooterGame = () => {
     }
 
     const handleCanvasTouchMove = (e) => {
-      e.preventDefault()
-      e.stopPropagation()
+      // Only preventDefault if event is cancelable (not passive)
+      if (e.cancelable !== false) {
+        try {
+          e.preventDefault()
+        } catch (err) {
+          // Ignore if preventDefault fails (passive listener)
+        }
+      }
+      if (typeof e.stopPropagation === 'function') {
+        e.stopPropagation()
+      }
     }
 
     const handleCanvasTouchEnd = (e) => {
-      e.preventDefault()
-      e.stopPropagation()
+      // Only preventDefault if event is cancelable (not passive)
+      if (e.cancelable !== false) {
+        try {
+          e.preventDefault()
+        } catch (err) {
+          // Ignore if preventDefault fails (passive listener)
+        }
+      }
+      if (typeof e.stopPropagation === 'function') {
+        e.stopPropagation()
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown)
@@ -228,15 +339,9 @@ const ShooterGame = () => {
     canvas.addEventListener('touchmove', handleCanvasTouchMove, { passive: false })
     canvas.addEventListener('touchend', handleCanvasTouchEnd, { passive: false })
     
-    // Also listen on document for touchmove/touchend to handle joystick when touch moves outside
-    if (isMobile) {
-      document.addEventListener('touchmove', handleTouchMove, { passive: false })
-      document.addEventListener('touchend', handleTouchEnd, { passive: false })
-    }
-    
     // Add mobile button listeners with a small delay to ensure refs are set
     const buttonTimeout = setTimeout(() => {
-      if (isMobile) {
+      if (mobile) {
         if (leftButtonRef.current) {
           leftButtonRef.current.addEventListener('touchstart', handleLeftPress, { passive: false })
           leftButtonRef.current.addEventListener('touchend', handleLeftRelease, { passive: false })
@@ -276,12 +381,21 @@ const ShooterGame = () => {
         game.player.x += game.player.speed
       }
 
-      // Mobile button movement
-      if (isMovingLeft) {
+      // Mobile button movement - use refs and game object for reliable updates
+      // Check refs first (updated immediately), then game object
+      if (movingLeftRef.current || game.movingLeft) {
         game.player.x -= game.player.speed
+        // Keep game object in sync
+        if (!game.movingLeft) game.movingLeft = true
+      } else {
+        game.movingLeft = false
       }
-      if (isMovingRight) {
+      if (movingRightRef.current || game.movingRight) {
         game.player.x += game.player.speed
+        // Keep game object in sync
+        if (!game.movingRight) game.movingRight = true
+      } else {
+        game.movingRight = false
       }
 
       // Gravity and jumping - balanced gravity
@@ -455,7 +569,7 @@ const ShooterGame = () => {
       }
       if (buttonTimeout) clearTimeout(buttonTimeout)
     }
-  }, [isPlaying, isMobile, isMovingLeft, isMovingRight])
+  }, [isPlaying, isMobile])
 
   return (
     <div className="shooter-game-container">
@@ -472,15 +586,54 @@ const ShooterGame = () => {
               aria-label="Move Left"
               onTouchStart={(e) => {
                 e.stopPropagation()
-                handleLeftPress(e)
+                // Create a new event-like object that allows preventDefault
+                const syntheticEvent = {
+                  ...e,
+                  preventDefault: () => {
+                    try {
+                      e.preventDefault()
+                    } catch (err) {
+                      // Ignore if preventDefault fails
+                    }
+                  },
+                  cancelable: true
+                }
+                handleLeftPress(syntheticEvent)
               }}
               onTouchEnd={(e) => {
                 e.stopPropagation()
-                handleLeftRelease(e)
+                const syntheticEvent = {
+                  ...e,
+                  preventDefault: () => {
+                    try {
+                      e.preventDefault()
+                    } catch (err) {
+                      // Ignore if preventDefault fails
+                    }
+                  },
+                  stopPropagation: () => {
+                    if (typeof e.stopPropagation === 'function') {
+                      e.stopPropagation()
+                    }
+                  },
+                  cancelable: true
+                }
+                handleLeftRelease(syntheticEvent)
               }}
               onTouchCancel={(e) => {
                 e.stopPropagation()
-                handleLeftRelease(e)
+                const syntheticEvent = {
+                  ...e,
+                  preventDefault: () => {
+                    try {
+                      e.preventDefault()
+                    } catch (err) {
+                      // Ignore if preventDefault fails
+                    }
+                  },
+                  cancelable: true
+                }
+                handleLeftRelease(syntheticEvent)
               }}
               type="button"
             >
@@ -492,15 +645,58 @@ const ShooterGame = () => {
               aria-label="Move Right"
               onTouchStart={(e) => {
                 e.stopPropagation()
-                handleRightPress(e)
+                const syntheticEvent = {
+                  ...e,
+                  preventDefault: () => {
+                    try {
+                      e.preventDefault()
+                    } catch (err) {
+                      // Ignore if preventDefault fails
+                    }
+                  },
+                  cancelable: true
+                }
+                handleRightPress(syntheticEvent)
               }}
               onTouchEnd={(e) => {
                 e.stopPropagation()
-                handleRightRelease(e)
+                const syntheticEvent = {
+                  ...e,
+                  preventDefault: () => {
+                    try {
+                      e.preventDefault()
+                    } catch (err) {
+                      // Ignore if preventDefault fails
+                    }
+                  },
+                  stopPropagation: () => {
+                    if (typeof e.stopPropagation === 'function') {
+                      e.stopPropagation()
+                    }
+                  },
+                  cancelable: true
+                }
+                handleRightRelease(syntheticEvent)
               }}
               onTouchCancel={(e) => {
                 e.stopPropagation()
-                handleRightRelease(e)
+                const syntheticEvent = {
+                  ...e,
+                  preventDefault: () => {
+                    try {
+                      e.preventDefault()
+                    } catch (err) {
+                      // Ignore if preventDefault fails
+                    }
+                  },
+                  stopPropagation: () => {
+                    if (typeof e.stopPropagation === 'function') {
+                      e.stopPropagation()
+                    }
+                  },
+                  cancelable: true
+                }
+                handleRightRelease(syntheticEvent)
               }}
               type="button"
             >
@@ -517,7 +713,18 @@ const ShooterGame = () => {
             }}
             onTouchStart={(e) => {
               e.stopPropagation()
-              handleJump(e)
+              const syntheticEvent = {
+                ...e,
+                preventDefault: () => {
+                  try {
+                    e.preventDefault()
+                  } catch (err) {
+                    // Ignore if preventDefault fails
+                  }
+                },
+                cancelable: true
+              }
+              handleJump(syntheticEvent)
             }}
             type="button"
           >

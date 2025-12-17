@@ -463,11 +463,23 @@
   .about {
     padding: 7rem 1.5rem 2rem;
     touch-action: pan-y;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 
   .about-content {
+    grid-template-columns: 1fr !important;
     gap: 2rem;
     margin-bottom: 2rem;
+    display: grid !important;
+  }
+  
+  .about-left,
+  .about-right {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 
   .about-title {
@@ -552,10 +564,24 @@
   .skill-stat-4:active .stat-label {
     color: #ff0088;
   }
-}
+  
+  .about-process {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
 
   .process-content {
     gap: 2rem;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .process-text,
+  .process-image {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 
   .process-title {

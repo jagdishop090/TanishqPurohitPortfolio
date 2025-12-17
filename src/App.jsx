@@ -38,6 +38,9 @@ function App() {
       setTimeout(() => {
         setAboutAnimated(true)
       }, 200)
+    } else {
+      // Ensure about is animated when navigating away and back
+      setAboutAnimated(true)
     }
     
     // Reset transition state after animation completes
@@ -46,6 +49,16 @@ function App() {
       setNextPath(null)
     }, 1500)
   }
+  
+  // Ensure About section is animated when it becomes active
+  useEffect(() => {
+    if (activeSection === 'about' && !aboutAnimated) {
+      const timer = setTimeout(() => {
+        setAboutAnimated(true)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [activeSection, aboutAnimated])
 
   const triggerStairAnimation = (sectionId) => {
     const now = Date.now()

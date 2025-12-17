@@ -43,13 +43,97 @@
   margin: 0;
 }
 
+.about-cta-button-wrapper {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+  margin-top: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.about-cta-button-wrapper:hover {
+  transform: translateX(5px);
+}
+
+.about-cta-border-svg {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  z-index: 2;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  will-change: transform;
+  backface-visibility: hidden;
+  overflow: visible;
+}
+
+.button-border-path {
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  will-change: stroke-dashoffset;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.button-border-path.path-1 {
+  animation: drawButtonBorder 6s linear infinite;
+}
+
+.button-border-path.path-2 {
+  animation: drawButtonBorder 8s linear infinite;
+  animation-delay: 1.5s;
+}
+
+.button-border-path.path-3 {
+  animation: drawButtonBorder 7s linear infinite;
+  animation-delay: 3s;
+}
+
+.button-border-path.path-4 {
+  animation: drawButtonBorder 9s linear infinite;
+  animation-delay: 0.5s;
+}
+
+@keyframes drawButtonBorder {
+  0% {
+    stroke-dashoffset: 500;
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.6;
+  }
+}
+
+/* Disable border animation on mobile */
+@media (max-width: 768px) {
+  .about-cta-border-svg {
+    display: none;
+  }
+  
+  .button-border-path {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button-border-path {
+    animation: none !important;
+  }
+}
+
 .about-cta-button {
   display: inline-flex;
   align-items: center;
   gap: 0.8rem;
   padding: 0.8rem 1.5rem;
   background: var(--accent);
-  color: var(--white);
+  color: #000000;
   text-decoration: none;
   border: none;
   border-radius: 50px;
@@ -58,14 +142,14 @@
   letter-spacing: 0.05em;
   transition: all 0.3s ease;
   width: fit-content;
-  margin-top: 0.5rem;
   cursor: pointer;
   font-family: inherit;
+  position: relative;
+  z-index: 1;
 }
 
 .about-cta-button:hover {
   background: var(--accent-hover);
-  transform: translateX(5px);
 }
 
 .about-cta-button svg {
@@ -94,15 +178,73 @@
   padding: 1.2rem;
   background: var(--white);
   border-radius: 10px;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.skill-stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.skill-stat-1::before {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.1));
+  box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.skill-stat-2::before {
+  background: linear-gradient(135deg, rgba(255, 0, 255, 0.2), rgba(255, 0, 255, 0.1));
+  box-shadow: inset 0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+.skill-stat-3::before {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.1));
+  box-shadow: inset 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.skill-stat-4::before {
+  background: linear-gradient(135deg, rgba(255, 0, 136, 0.2), rgba(255, 0, 136, 0.1));
+  box-shadow: inset 0 0 20px rgba(255, 0, 136, 0.3);
 }
 
 .skill-stat:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 0 30px rgba(0, 0, 0, 0.1);
+}
+
+.skill-stat:hover::before {
+  opacity: 1;
+}
+
+.skill-stat-1:hover {
+  box-shadow: 0 8px 25px rgba(0, 255, 255, 0.4), 0 0 30px rgba(0, 255, 255, 0.3);
+  border-color: rgba(0, 255, 255, 0.3);
+}
+
+.skill-stat-2:hover {
+  box-shadow: 0 8px 25px rgba(255, 0, 255, 0.4), 0 0 30px rgba(255, 0, 255, 0.3);
+  border-color: rgba(255, 0, 255, 0.3);
+}
+
+.skill-stat-3:hover {
+  box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4), 0 0 30px rgba(0, 255, 136, 0.3);
+  border-color: rgba(0, 255, 136, 0.3);
+}
+
+.skill-stat-4:hover {
+  box-shadow: 0 8px 25px rgba(255, 0, 136, 0.4), 0 0 30px rgba(255, 0, 136, 0.3);
+  border-color: rgba(255, 0, 136, 0.3);
 }
 
 .stat-number {
@@ -112,6 +254,9 @@
   color: var(--text-dark);
   line-height: 1;
   margin-bottom: 0.3rem;
+  position: relative;
+  z-index: 1;
+  transition: color 0.3s ease;
 }
 
 .stat-label {
@@ -121,6 +266,29 @@
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  position: relative;
+  z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.skill-stat-1:hover .stat-number,
+.skill-stat-1:hover .stat-label {
+  color: #00ffff;
+}
+
+.skill-stat-2:hover .stat-number,
+.skill-stat-2:hover .stat-label {
+  color: #ff00ff;
+}
+
+.skill-stat-3:hover .stat-number,
+.skill-stat-3:hover .stat-label {
+  color: #00ff88;
+}
+
+.skill-stat-4:hover .stat-number,
+.skill-stat-4:hover .stat-label {
+  color: #ff0088;
 }
 
 /* Process Section */
@@ -165,7 +333,7 @@
 
 .process-step {
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .process-step:last-child {

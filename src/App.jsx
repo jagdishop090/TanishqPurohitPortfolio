@@ -3,7 +3,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import DynamicBackground from './components/DynamicBackground'
 import StairTransition from './components/StairTransition'
-import CustomCursor from './components/CustomCursor'
+// import CustomCursor from './components/CustomCursor'
 import MobilePopup from './components/MobilePopup'
 import FloatingWarning from './components/FloatingWarning'
 import Home from './pages/Home'
@@ -72,7 +72,7 @@ function App() {
     <div className="app">
       <MobilePopup ref={mobilePopupRef} />
       <FloatingWarning onShowPopup={handleShowPopup} />
-      <CustomCursor />
+      {/* <CustomCursor /> */}
       <DynamicBackground />
       <Header activeSection={activeSection} onNavigate={scrollToSection} />
       <StairTransition 

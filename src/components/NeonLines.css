@@ -7,7 +7,7 @@
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.5;
+  opacity: 0.8;
 }
 
 /* Disable animations on mobile for better performance */
@@ -84,174 +84,174 @@
 @keyframes drawLine1 {
   0% {
     stroke-dashoffset: 150;
-    opacity: 0.4;
+    opacity: 0.7;
   }
   15% {
-    opacity: 0.7;
+    opacity: 0.9;
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
   85% {
-    opacity: 0.7;
+    opacity: 0.9;
   }
   100% {
     stroke-dashoffset: -150;
-    opacity: 0.4;
+    opacity: 0.7;
   }
 }
 
 @keyframes drawLine2 {
   0% {
     stroke-dashoffset: 150;
-    opacity: 0.4;
+    opacity: 0.7;
   }
   15% {
-    opacity: 0.7;
+    opacity: 0.9;
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
   85% {
-    opacity: 0.7;
+    opacity: 0.9;
   }
   100% {
     stroke-dashoffset: -150;
-    opacity: 0.4;
+    opacity: 0.7;
   }
 }
 
 @keyframes drawLine3 {
   0% {
     stroke-dashoffset: 150;
-    opacity: 0.4;
+    opacity: 0.7;
   }
   15% {
-    opacity: 0.7;
+    opacity: 0.9;
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
   85% {
-    opacity: 0.7;
+    opacity: 0.9;
   }
   100% {
     stroke-dashoffset: -150;
-    opacity: 0.4;
+    opacity: 0.7;
   }
 }
 
 @keyframes drawLine4 {
   0% {
     stroke-dashoffset: 150;
-    opacity: 0.4;
+    opacity: 0.7;
   }
   15% {
-    opacity: 0.7;
+    opacity: 0.9;
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
   85% {
-    opacity: 0.7;
+    opacity: 0.9;
   }
   100% {
     stroke-dashoffset: -150;
-    opacity: 0.4;
+    opacity: 0.7;
   }
 }
 
 @keyframes drawLine5 {
   0% {
     stroke-dashoffset: 150;
-    opacity: 0.4;
+    opacity: 0.7;
   }
   15% {
-    opacity: 0.7;
+    opacity: 0.9;
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
   85% {
-    opacity: 0.7;
+    opacity: 0.9;
   }
   100% {
     stroke-dashoffset: -150;
-    opacity: 0.4;
+    opacity: 0.7;
   }
 }
 
 @keyframes drawLine6 {
   0% {
     stroke-dashoffset: 150;
-    opacity: 0.4;
+    opacity: 0.7;
   }
   15% {
-    opacity: 0.7;
+    opacity: 0.9;
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
   85% {
-    opacity: 0.7;
+    opacity: 0.9;
   }
   100% {
     stroke-dashoffset: -150;
-    opacity: 0.4;
+    opacity: 0.7;
   }
 }
 
 @keyframes pulse1 {
   0%, 100% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
   50% {
-    opacity: 0.8;
+    opacity: 1;
   }
 }
 
 @keyframes pulse2 {
   0%, 100% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
   50% {
-    opacity: 0.8;
+    opacity: 1;
   }
 }
 
 @keyframes pulse3 {
   0%, 100% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
   50% {
-    opacity: 0.8;
+    opacity: 1;
   }
 }
 
 @keyframes pulse4 {
   0%, 100% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
   50% {
-    opacity: 0.8;
+    opacity: 1;
   }
 }
 
 @keyframes pulse5 {
   0%, 100% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
   50% {
-    opacity: 0.8;
+    opacity: 1;
   }
 }
 
 @keyframes pulse6 {
   0%, 100% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
   50% {
-    opacity: 0.8;
+    opacity: 1;
   }
 }
 

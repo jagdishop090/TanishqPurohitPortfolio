@@ -22,7 +22,7 @@
   width: 120%;
   height: 20%;
   left: -10%;
-  background: var(--bg-light);
+  background: #0a0a0a;
   transform: translate3d(0, 100%, 0);
   will-change: transform;
   backface-visibility: hidden;

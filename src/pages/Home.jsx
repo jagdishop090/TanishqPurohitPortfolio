@@ -20,16 +20,45 @@ const Home = memo(({ onNavigate }) => {
     let tiltY = 0
     let targetX = 0
     let targetY = 0
+    let isAnimating = false
 
     const updateTransform = () => {
       // Smooth interpolation for better performance
+      const prevTiltX = tiltX
+      const prevTiltY = tiltY
+      
       tiltX += (targetX - tiltX) * 0.1
       tiltY += (targetY - tiltY) * 0.1
+      
+      // Check if we're close enough to the target
+      const diffX = Math.abs(targetX - tiltX)
+      const diffY = Math.abs(targetY - tiltY)
+      
+      // If very close, snap to target to prevent getting stuck
+      if (diffX < 0.01) tiltX = targetX
+      if (diffY < 0.01) tiltY = targetY
       
       portrait.style.setProperty('--tilt-x', `${tiltX}deg`)
       portrait.style.setProperty('--tilt-y', `${tiltY}deg`)
       
-      if (Math.abs(targetX - tiltX) > 0.01 || Math.abs(targetY - tiltY) > 0.01) {
+      // Continue animation if we're not at target or if values changed
+      const hasChanged = Math.abs(prevTiltX - tiltX) > 0.001 || Math.abs(prevTiltY - tiltY) > 0.001
+      const notAtTarget = diffX > 0.01 || diffY > 0.01
+      
+      if (notAtTarget || hasChanged) {
+        rafRef.current = requestAnimationFrame(updateTransform)
+      } else {
+        isAnimating = false
+        rafRef.current = null
+      }
+    }
+
+    const startAnimation = () => {
+      if (!isAnimating) {
+        isAnimating = true
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current)
+        }
         rafRef.current = requestAnimationFrame(updateTransform)
       }
     }
@@ -46,17 +75,13 @@ const Home = memo(({ onNavigate }) => {
       targetX = x * 15
       targetY = y * -15
       
-      if (!rafRef.current) {
-        rafRef.current = requestAnimationFrame(updateTransform)
-      }
+      startAnimation()
     }
 
     const handleMouseLeave = () => {
       targetX = 0
       targetY = 0
-      if (!rafRef.current) {
-        rafRef.current = requestAnimationFrame(updateTransform)
-      }
+      startAnimation()
     }
 
     portrait.addEventListener('mousemove', handleMouseMove, { passive: true })
@@ -115,15 +140,125 @@ const Home = memo(({ onNavigate }) => {
             <p className="home-description">
               I'm Tanishq Purohit, a passionate Designer, Software Developer, and Game Developer. I create digital experiences that combine creativity, functionality, and innovation.
             </p>
-            <button 
-              className="home-cta-button"
-              onClick={() => onNavigate && onNavigate('contact')}
-            >
-              <span>CONTACT ME</span>
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <div className="home-cta-button-wrapper">
+              <svg className="home-cta-border-svg" viewBox="0 0 200 50" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="homeButtonGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#00ffff" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#00ffff" stopOpacity="0.6" />
+                    <stop offset="100%" stopColor="#00ffff" stopOpacity="0.8" />
+                  </linearGradient>
+                  <linearGradient id="homeButtonGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#ff00ff" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#ff00ff" stopOpacity="0.6" />
+                    <stop offset="100%" stopColor="#ff00ff" stopOpacity="0.8" />
+                  </linearGradient>
+                  <linearGradient id="homeButtonGradient3" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#00ff88" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#00ff88" stopOpacity="0.6" />
+                    <stop offset="100%" stopColor="#00ff88" stopOpacity="0.8" />
+                  </linearGradient>
+                  <linearGradient id="homeButtonGradient4" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#ff0088" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#ff0088" stopOpacity="0.6" />
+                    <stop offset="100%" stopColor="#ff0088" stopOpacity="0.8" />
+                  </linearGradient>
+                  <filter id="homeButtonGlow1" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                  <filter id="homeButtonGlow2" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                  <filter id="homeButtonGlow3" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                  <filter id="homeButtonGlow4" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                <rect
+                  x="2"
+                  y="2"
+                  width="196"
+                  height="46"
+                  rx="25"
+                  ry="25"
+                  fill="none"
+                  stroke="url(#homeButtonGradient1)"
+                  strokeWidth="1.5"
+                  filter="url(#homeButtonGlow1)"
+                  className="home-button-border-path path-1"
+                  strokeLinecap="round"
+                />
+                <rect
+                  x="2"
+                  y="2"
+                  width="196"
+                  height="46"
+                  rx="25"
+                  ry="25"
+                  fill="none"
+                  stroke="url(#homeButtonGradient2)"
+                  strokeWidth="1.5"
+                  filter="url(#homeButtonGlow2)"
+                  className="home-button-border-path path-2"
+                  strokeLinecap="round"
+                />
+                <rect
+                  x="2"
+                  y="2"
+                  width="196"
+                  height="46"
+                  rx="25"
+                  ry="25"
+                  fill="none"
+                  stroke="url(#homeButtonGradient3)"
+                  strokeWidth="1.5"
+                  filter="url(#homeButtonGlow3)"
+                  className="home-button-border-path path-3"
+                  strokeLinecap="round"
+                />
+                <rect
+                  x="2"
+                  y="2"
+                  width="196"
+                  height="46"
+                  rx="25"
+                  ry="25"
+                  fill="none"
+                  stroke="url(#homeButtonGradient4)"
+                  strokeWidth="1.5"
+                  filter="url(#homeButtonGlow4)"
+                  className="home-button-border-path path-4"
+                  strokeLinecap="round"
+                />
               </svg>
-            </button>
+              <button 
+                className="home-cta-button"
+                onClick={() => onNavigate && onNavigate('contact')}
+              >
+                <span>CONTACT ME</span>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
           </motion.div>
 
           {/* Right Side - Portrait */}

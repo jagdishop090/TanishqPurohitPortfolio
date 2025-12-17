@@ -71,7 +71,7 @@ const Header = ({ activeSection, onNavigate }) => {
 
         {/* Desktop Contact Button */}
         <a href="#contact" className="header-contact-btn desktop-contact" onClick={(e) => handleClick(e, 'contact')}>
-          <span>CONTACT</span>
+          <span>CONNECT</span>
         </a>
 
         {/* Mobile Hamburger Menu Button */}
@@ -138,7 +138,7 @@ const Header = ({ activeSection, onNavigate }) => {
             }}
             style={{ pointerEvents: isMobileMenuOpen ? 'auto' : 'none' }}
           >
-            CONTACT
+            CONNECT
           </a>
         </nav>
       </motion.div>

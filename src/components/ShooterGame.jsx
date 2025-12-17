@@ -37,7 +37,7 @@ const ShooterGame = () => {
         width: 35,
         height: 35,
         speed: 5,
-        jumpPower: 12,
+        jumpPower: 18,
         velocityY: 0,
         onGround: false,
         emoji: '🐸'
@@ -163,7 +163,8 @@ const ShooterGame = () => {
       } else {
         joystickPositionRef.current = { x: touchX, y: touchY }
       }
-      setJoystickPosition(joystickPositionRef.current)
+      // Update immediately for better responsiveness
+      setJoystickPosition({ ...joystickPositionRef.current })
     }
 
     const handleTouchEnd = (e) => {
@@ -300,13 +301,13 @@ const ShooterGame = () => {
         game.player.x += game.player.speed
       }
 
-      // Mobile joystick movement
+      // Mobile joystick movement - increased responsiveness
       if (isJoystickActive && joystickPositionRef.current.x !== 0) {
-        game.player.x += joystickPositionRef.current.x * 0.15
+        game.player.x += joystickPositionRef.current.x * 0.25
       }
 
-      // Gravity and jumping
-      game.player.velocityY += 0.5
+      // Gravity and jumping - reduced gravity for better feel
+      game.player.velocityY += 0.4
       game.player.y += game.player.velocityY
 
       // Platform collision
@@ -337,8 +338,8 @@ const ShooterGame = () => {
         return bullet.x > 0 && bullet.x < canvas.width && bullet.y > 0 && bullet.y < canvas.height
       })
 
-      // Spawn enemies
-      if (Math.random() < 0.02) {
+      // Spawn enemies - reduced spawn rate for better performance
+      if (Math.random() < 0.015) {
         game.enemies.push({
           x: canvas.width,
           y: Math.random() * (canvas.height - 50),
@@ -367,13 +368,17 @@ const ShooterGame = () => {
           }
         }
 
-        // Player collision
-        if (
-          game.player.x < enemy.x + enemy.width &&
-          game.player.x + game.player.width > enemy.x &&
-          game.player.y < enemy.y + enemy.height &&
-          game.player.y + game.player.height > enemy.y
-        ) {
+        // Player collision - improved detection with better bounds checking
+        const playerCenterX = game.player.x + game.player.width / 2
+        const playerCenterY = game.player.y + game.player.height / 2
+        const enemyCenterX = enemy.x + enemy.width / 2
+        const enemyCenterY = enemy.y + enemy.height / 2
+        
+        const distanceX = Math.abs(playerCenterX - enemyCenterX)
+        const distanceY = Math.abs(playerCenterY - enemyCenterY)
+        const collisionDistance = (game.player.width + enemy.width) / 2 - 5 // Slightly smaller for better feel
+        
+        if (distanceX < collisionDistance && distanceY < collisionDistance) {
           game.gameOver = true
           setIsPlaying(false)
         }
@@ -426,11 +431,9 @@ const ShooterGame = () => {
         ctx.fillText('Click or Tap to Restart', canvas.width / 2, canvas.height / 2 + 20)
       }
 
-      // Throttle FPS
-      const fps = mobile ? 30 : 60
-      gameRef.current.animationId = setTimeout(() => {
-        requestAnimationFrame(gameLoop)
-      }, 1000 / fps)
+      // Use requestAnimationFrame directly for smoother performance
+      // No throttling needed - browser handles frame rate optimization
+      gameRef.current.animationId = requestAnimationFrame(gameLoop)
     }
 
     // Start game automatically
@@ -454,10 +457,10 @@ const ShooterGame = () => {
         jumpButtonRef.current.removeEventListener('touchstart', handleJump)
       }
       if (gameRef.current?.animationId) {
-        clearTimeout(gameRef.current.animationId)
+        cancelAnimationFrame(gameRef.current.animationId)
       }
-      clearTimeout(joystickTimeout)
-      clearTimeout(jumpTimeout)
+      if (joystickTimeout) clearTimeout(joystickTimeout)
+      if (jumpTimeout) clearTimeout(jumpTimeout)
     }
   }, [isPlaying, isMobile, isJoystickActive])
 

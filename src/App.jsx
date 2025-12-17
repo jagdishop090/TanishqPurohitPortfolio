@@ -6,6 +6,7 @@ import StairTransition from './components/StairTransition'
 // import CustomCursor from './components/CustomCursor'
 import MobilePopup from './components/MobilePopup'
 import FloatingWarning from './components/FloatingWarning'
+import LoadingScreen from './components/LoadingScreen'
 import Home from './pages/Home'
 import './App.css'
 
@@ -20,6 +21,7 @@ function App() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [nextPath, setNextPath] = useState(null)
   const [aboutAnimated, setAboutAnimated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const sectionsRef = useRef({})
   const lastTriggeredTime = useRef(0)
   const mobilePopupRef = useRef(null)
@@ -93,8 +95,13 @@ function App() {
     }
   }, [])
 
+  const handleLoadingComplete = useCallback(() => {
+    setIsLoading(false)
+  }, [])
+
   return (
     <div className="app">
+      {isLoading && <LoadingScreen onComplete={handleLoadingComplete} />}
       <MobilePopup ref={mobilePopupRef} />
       <FloatingWarning onShowPopup={handleShowPopup} />
       {/* <CustomCursor /> */}

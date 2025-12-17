@@ -109,7 +109,7 @@ const Skills = () => {
                             ease: "easeOut"
                           }}
                           style={{
-                            backgroundColor: isHovered ? 'var(--accent)' : 'var(--text-dark)'
+                            backgroundColor: '#0066ff'
                           }}
                         />
                       </div>

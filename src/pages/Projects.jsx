@@ -8,30 +8,30 @@ const Projects = () => {
       number: '01',
       year: '2025',
       category: 'Web Development',
-      type: 'Web App',
-      title: 'Immersive Web Experience',
-      description: 'A cutting-edge web application featuring modern design and smooth interactions with seamless user experience.',
-      image: null
+      type: 'CRM & Inventory Management',
+      title: 'AI-Powered CRM & Inventory Management System',
+      description: 'Ventory - A fully functional CRM and inventory management software featuring comprehensive business management tools with AI integration for intelligent insights, automated workflows, and predictive analytics. Includes customer relationship management, inventory tracking, sales analytics, and advanced reporting capabilities.',
+      image: '/crm-logo.png'
     },
     {
       id: 2,
       number: '02',
       year: '2024',
       category: 'Game Development',
-      type: 'Game',
-      title: 'Interactive Game World',
-      description: 'An immersive game environment with dynamic physics and engaging gameplay mechanics for an exceptional player experience.',
-      image: null
+      type: '3D Horror Game',
+      title: 'Wada 1729',
+      description: 'Wada 1729 - A 3D horror game beta version based on Pune\'s historic Shaniwar Wada. An immersive horror experience set in the iconic historical monument, featuring atmospheric environments, spine-chilling gameplay, and authentic architectural details. Currently under active development.',
+      image: '/wada-1729.png'
     },
     {
       id: 3,
       number: '03',
       year: '2025',
       category: 'Design',
-      type: 'Mobile App',
-      title: 'Design System Library',
-      description: 'A comprehensive design system with reusable components and consistent visual language focused on accessibility.',
-      image: null
+      type: 'UI/UX & Graphic Design',
+      title: 'Design Portfolio Collection',
+      description: 'A curated collection of basic and immersive UI/UX designs, logo designs, and graphic design work. Showcasing creative solutions, modern interfaces, and visual identity designs. Drive link available for detailed portfolio review.',
+      image: '/designkit.png'
     }
   ]
 
@@ -105,13 +105,34 @@ const Projects = () => {
                   </a>
                 </div>
                 <div className="project-right">
-                  <div className="project-image-placeholder">
-                    <div className="project-image-shapes">
-                      <div className="shape shape-square"></div>
-                      <div className="shape shape-circle"></div>
-                      <div className="shape shape-circle"></div>
+                  {project.image ? (
+                    <div className="project-image-container">
+                      <img 
+                        src={project.image} 
+                        alt={project.title} 
+                        className="project-image"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                      <div className="project-image-placeholder" style={{ display: 'none' }}>
+                        <div className="project-image-shapes">
+                          <div className="shape shape-square"></div>
+                          <div className="shape shape-circle"></div>
+                          <div className="shape shape-circle"></div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="project-image-placeholder">
+                      <div className="project-image-shapes">
+                        <div className="shape shape-square"></div>
+                        <div className="shape shape-circle"></div>
+                        <div className="shape shape-circle"></div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>

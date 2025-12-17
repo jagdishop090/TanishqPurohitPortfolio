@@ -5,12 +5,16 @@
   background: var(--bg-light);
   display: flex;
   align-items: center;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .about-container {
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .about-content {
@@ -110,14 +114,42 @@
   }
 }
 
-/* Disable border animation on mobile */
+/* Keep border animation on mobile */
 @media (max-width: 768px) {
   .about-cta-border-svg {
-    display: none;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 10;
   }
   
   .button-border-path {
-    animation: none !important;
+    stroke-width: 3px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  
+  .button-border-path.path-1,
+  .button-border-path.path-2,
+  .button-border-path.path-3,
+  .button-border-path.path-4 {
+    animation-play-state: running !important;
+    animation: drawButtonBorder 6s linear infinite !important;
+  }
+  
+  .button-border-path.path-2 {
+    animation: drawButtonBorder 8s linear infinite !important;
+    animation-delay: 1.5s !important;
+  }
+  
+  .button-border-path.path-3 {
+    animation: drawButtonBorder 7s linear infinite !important;
+    animation-delay: 3s !important;
+  }
+  
+  .button-border-path.path-4 {
+    animation: drawButtonBorder 9s linear infinite !important;
+    animation-delay: 0.5s !important;
   }
 }
 
@@ -430,6 +462,7 @@
 @media (max-width: 768px) {
   .about {
     padding: 7rem 1.5rem 2rem;
+    touch-action: pan-y;
   }
 
   .about-content {
@@ -452,11 +485,74 @@
 
   .skill-stat {
     padding: 1rem;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .stat-number {
     font-size: 1.8rem;
   }
+  
+  /* Touch feedback for stat cards on mobile */
+  .skill-stat:active {
+    transform: translateY(-3px);
+  }
+  
+  .skill-stat-1:active {
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.4), 0 0 30px rgba(0, 255, 255, 0.3);
+    border-color: rgba(0, 255, 255, 0.3);
+  }
+  
+  .skill-stat-1:active::before {
+    opacity: 1;
+  }
+  
+  .skill-stat-1:active .stat-number,
+  .skill-stat-1:active .stat-label {
+    color: #00ffff;
+  }
+  
+  .skill-stat-2:active {
+    box-shadow: 0 8px 25px rgba(255, 0, 255, 0.4), 0 0 30px rgba(255, 0, 255, 0.3);
+    border-color: rgba(255, 0, 255, 0.3);
+  }
+  
+  .skill-stat-2:active::before {
+    opacity: 1;
+  }
+  
+  .skill-stat-2:active .stat-number,
+  .skill-stat-2:active .stat-label {
+    color: #ff00ff;
+  }
+  
+  .skill-stat-3:active {
+    box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4), 0 0 30px rgba(0, 255, 136, 0.3);
+    border-color: rgba(0, 255, 136, 0.3);
+  }
+  
+  .skill-stat-3:active::before {
+    opacity: 1;
+  }
+  
+  .skill-stat-3:active .stat-number,
+  .skill-stat-3:active .stat-label {
+    color: #00ff88;
+  }
+  
+  .skill-stat-4:active {
+    box-shadow: 0 8px 25px rgba(255, 0, 136, 0.4), 0 0 30px rgba(255, 0, 136, 0.3);
+    border-color: rgba(255, 0, 136, 0.3);
+  }
+  
+  .skill-stat-4:active::before {
+    opacity: 1;
+  }
+  
+  .skill-stat-4:active .stat-number,
+  .skill-stat-4:active .stat-label {
+    color: #ff0088;
+  }
+}
 
   .process-content {
     gap: 2rem;

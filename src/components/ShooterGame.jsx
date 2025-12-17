@@ -4,14 +4,12 @@ import './ShooterGame.css'
 const ShooterGame = () => {
   const canvasRef = useRef(null)
   const gameRef = useRef(null)
-  const [isPlaying, setIsPlaying] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(true)
   const joystickRef = useRef(null)
   const joystickStickRef = useRef(null)
   const jumpButtonRef = useRef(null)
   const [isMobile, setIsMobile] = useState(false)
-  const isMobileRef = useRef(false)
   const joystickPositionRef = useRef({ x: 0, y: 0 })
-  const isJoystickActiveRef = useRef(false)
   const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 })
   const [isJoystickActive, setIsJoystickActive] = useState(false)
 
@@ -23,7 +21,6 @@ const ShooterGame = () => {
     }
     const mobile = checkMobile()
     setIsMobile(mobile)
-    isMobileRef.current = mobile
 
     const canvas = canvasRef.current
     if (!canvas) return
@@ -79,6 +76,8 @@ const ShooterGame = () => {
     }
 
     const handleClick = (e) => {
+      e.stopPropagation()
+      
       if (game.gameOver) {
         // Reset game
         game.player.x = 50
@@ -92,511 +91,420 @@ const ShooterGame = () => {
         return
       }
 
+      if (!isPlaying) return
+
       const rect = canvas.getBoundingClientRect()
-      const mouseX = e.clientX - rect.left
-      const mouseY = e.clientY - rect.top
+      const scaleX = canvas.width / rect.width
+      const scaleY = canvas.height / rect.height
+      const mouseX = (e.clientX - rect.left) * scaleX
+      const mouseY = (e.clientY - rect.top) * scaleY
 
       // Shoot bullet towards mouse
       const angle = Math.atan2(
-        mouseY - (game.player.y + game.player.height / 2),
-        mouseX - (game.player.x + game.player.width / 2)
+        mouseY - game.player.y - game.player.height / 2,
+        mouseX - game.player.x - game.player.width / 2
       )
-
       game.bullets.push({
         x: game.player.x + game.player.width / 2,
         y: game.player.y + game.player.height / 2,
         vx: Math.cos(angle) * 8,
-        vy: Math.sin(angle) * 8,
-        radius: 4
+        vy: Math.sin(angle) * 8
       })
     }
 
-    // Joystick handlers
-    const joystickBase = joystickRef.current
-    const joystickStick = joystickStickRef.current
-    const jumpButton = jumpButtonRef.current
-    let activeTouchId = null
-    let joystickBaseRect = null
-    const container = canvas.parentElement
-
-    const getJoystickPosition = (touch) => {
-      if (!joystickBase || !joystickBaseRect) return { x: 0, y: 0 }
-      
-      const baseCenterX = joystickBaseRect.left + joystickBaseRect.width / 2
-      const baseCenterY = joystickBaseRect.top + joystickBaseRect.height / 2
-      const baseRadius = joystickBaseRect.width / 2
-      
-      const deltaX = touch.clientX - baseCenterX
-      const deltaY = touch.clientY - baseCenterY
-      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
-      
-      const clampedDistance = Math.min(distance, baseRadius * 0.7)
-      const angle = Math.atan2(deltaY, deltaX)
-      
-      return {
-        x: (clampedDistance / baseRadius) * Math.cos(angle),
-        y: (clampedDistance / baseRadius) * Math.sin(angle)
-      }
-    }
-
+    // Joystick handling
     const handleTouchStart = (e) => {
-      if (!isMobileRef.current) return
-      
-      const touch = e.touches[0]
-      if (!touch) return
-      
-      const touchX = touch.clientX
-      const touchY = touch.clientY
-      
-      // Check for game over restart first
+      e.preventDefault()
+      e.stopPropagation()
       if (game.gameOver) {
-        const rect = canvas.getBoundingClientRect()
-        if (
-          touchX >= rect.left &&
-          touchX <= rect.right &&
-          touchY >= rect.top &&
-          touchY <= rect.bottom
-        ) {
-          e.preventDefault()
-          e.stopPropagation()
-          // Reset game
-          game.player.x = 50
-          game.player.y = 300
-          game.player.velocityY = 0
-          game.bullets = []
-          game.enemies = []
-          game.score = 0
-          game.gameOver = false
-          setIsPlaying(true)
-          return
-        }
+        game.player.x = 50
+        game.player.y = 300
+        game.player.velocityY = 0
+        game.bullets = []
+        game.enemies = []
+        game.score = 0
+        game.gameOver = false
+        setIsPlaying(true)
+        return
       }
+
+      if (!joystickRef.current) return
+      const touch = e.touches[0]
+      const rect = joystickRef.current.getBoundingClientRect()
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+      const touchX = touch.clientX - centerX
+      const touchY = touch.clientY - centerY
       
-      activeTouchId = touch.identifier
-      
-      if (joystickBase) {
-        joystickBaseRect = joystickBase.getBoundingClientRect()
-        
-        // Check if touch is on joystick base
-        const baseCenterX = joystickBaseRect.left + joystickBaseRect.width / 2
-        const baseCenterY = joystickBaseRect.top + joystickBaseRect.height / 2
-        const distance = Math.sqrt(
-          Math.pow(touchX - baseCenterX, 2) + Math.pow(touchY - baseCenterY, 2)
-        )
-        
-        if (distance <= joystickBaseRect.width / 2 + 30) { // Add tolerance for easier interaction
-          e.preventDefault()
-          e.stopPropagation()
-          setIsJoystickActive(true)
-          isJoystickActiveRef.current = true
-          const pos = getJoystickPosition(touch)
-          setJoystickPosition(pos)
-          joystickPositionRef.current = pos
-          if (joystickStick) {
-            joystickStick.style.transform = `translate(${pos.x * 35}px, ${pos.y * 35}px)`
-          }
-          return
-        }
-      }
-      
-      if (jumpButton) {
-        const jumpRect = jumpButton.getBoundingClientRect()
-        if (
-          touchX >= jumpRect.left - 10 &&
-          touchX <= jumpRect.right + 10 &&
-          touchY >= jumpRect.top - 10 &&
-          touchY <= jumpRect.bottom + 10
-        ) {
-          e.preventDefault()
-          e.stopPropagation()
-          // Jump
-          if (game.player.onGround) {
-            game.player.velocityY = -game.player.jumpPower
-            game.player.onGround = false
-          }
-          return
-        }
-      }
-      
-      // Shoot at touch position (on canvas) - exclude joystick and jump button areas
-      const rect = canvas.getBoundingClientRect()
-      
-      // Check if touch is within canvas bounds
-      if (
-        touchX >= rect.left &&
-        touchX <= rect.right &&
-        touchY >= rect.top &&
-        touchY <= rect.bottom
-      ) {
-        // Make sure we're not touching joystick or jump button area
-        const isOnJoystick = joystickBase && joystickBaseRect && 
-          Math.sqrt(
-            Math.pow(touchX - (joystickBaseRect.left + joystickBaseRect.width / 2), 2) + 
-            Math.pow(touchY - (joystickBaseRect.top + joystickBaseRect.height / 2), 2)
-          ) <= joystickBaseRect.width / 2 + 30
-        
-        const isOnJumpButton = jumpButton && 
-          touchX >= jumpButton.getBoundingClientRect().left - 10 &&
-          touchX <= jumpButton.getBoundingClientRect().right + 10 &&
-          touchY >= jumpButton.getBoundingClientRect().top - 10 &&
-          touchY <= jumpButton.getBoundingClientRect().bottom + 10
-        
-        if (!isOnJoystick && !isOnJumpButton) {
-          e.preventDefault()
-          e.stopPropagation()
-          
-          // Convert screen coordinates to canvas coordinates
-          // Account for canvas scaling
-          const scaleX = canvas.width / rect.width
-          const scaleY = canvas.height / rect.height
-          const canvasX = (touchX - rect.left) * scaleX
-          const canvasY = (touchY - rect.top) * scaleY
-          
-          // Calculate angle using canvas coordinates
-          const playerCenterX = game.player.x + game.player.width / 2
-          const playerCenterY = game.player.y + game.player.height / 2
-          
-          const angle = Math.atan2(
-            canvasY - playerCenterY,
-            canvasX - playerCenterX
-          )
-          
-          game.bullets.push({
-            x: playerCenterX,
-            y: playerCenterY,
-            vx: Math.cos(angle) * 8,
-            vy: Math.sin(angle) * 8,
-            radius: 4
-          })
-        }
-      }
+      setIsJoystickActive(true)
+      joystickPositionRef.current = { x: touchX, y: touchY }
+      setJoystickPosition({ x: touchX, y: touchY })
     }
 
     const handleTouchMove = (e) => {
-      if (!isMobileRef.current || !isJoystickActiveRef.current || !activeTouchId) return
-      
-      const touch = Array.from(e.touches).find(t => t.identifier === activeTouchId)
-      if (!touch) return
-      
+      if (!isJoystickActive || !joystickRef.current) return
       e.preventDefault()
-      const pos = getJoystickPosition(touch)
-      setJoystickPosition(pos)
-      joystickPositionRef.current = pos
-      if (joystickStick) {
-        joystickStick.style.transform = `translate(${pos.x * 35}px, ${pos.y * 35}px)`
+      e.stopPropagation()
+      const touch = e.touches[0]
+      const rect = joystickRef.current.getBoundingClientRect()
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+      const touchX = touch.clientX - centerX
+      const touchY = touch.clientY - centerY
+      const distance = Math.sqrt(touchX * touchX + touchY * touchY)
+      const maxDistance = 40
+      
+      if (distance > maxDistance) {
+        const angle = Math.atan2(touchY, touchX)
+        joystickPositionRef.current = {
+          x: Math.cos(angle) * maxDistance,
+          y: Math.sin(angle) * maxDistance
+        }
+      } else {
+        joystickPositionRef.current = { x: touchX, y: touchY }
       }
+      setJoystickPosition(joystickPositionRef.current)
     }
 
     const handleTouchEnd = (e) => {
-      if (!isMobileRef.current) return
-      
-      const touch = Array.from(e.changedTouches).find(t => t.identifier === activeTouchId)
-      if (touch) {
+      if (e) {
         e.preventDefault()
-        setIsJoystickActive(false)
-        isJoystickActiveRef.current = false
-        setJoystickPosition({ x: 0, y: 0 })
-        joystickPositionRef.current = { x: 0, y: 0 }
-        if (joystickStick) {
-          joystickStick.style.transform = 'translate(0, 0)'
-        }
-        activeTouchId = null
+        e.stopPropagation()
       }
+      setIsJoystickActive(false)
+      joystickPositionRef.current = { x: 0, y: 0 }
+      setJoystickPosition({ x: 0, y: 0 })
+    }
+
+    const handleJump = (e) => {
+      if (e) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+      if (game.player.onGround) {
+        game.player.velocityY = -game.player.jumpPower
+        game.player.onGround = false
+      }
+    }
+
+    // Touch shooting
+    const handleCanvasTouch = (e) => {
+      if (game.gameOver) {
+        // Reset game on touch
+        game.player.x = 50
+        game.player.y = 300
+        game.player.velocityY = 0
+        game.bullets = []
+        game.enemies = []
+        game.score = 0
+        game.gameOver = false
+        setIsPlaying(true)
+        return
+      }
+      
+      if (!isPlaying) return
+      
+      e.preventDefault()
+      e.stopPropagation()
+      
+      if (!e.touches || e.touches.length === 0) return
+      const touch = e.touches[0]
+      
+      const rect = canvas.getBoundingClientRect()
+      const scaleX = canvas.width / rect.width
+      const scaleY = canvas.height / rect.height
+      const canvasX = (touch.clientX - rect.left) * scaleX
+      const canvasY = (touch.clientY - rect.top) * scaleY
+
+      // Don't shoot if touching joystick or jump button area
+      const joystickRect = joystickRef.current?.getBoundingClientRect()
+      const jumpRect = jumpButtonRef.current?.getBoundingClientRect()
+      if (joystickRect && touch.clientX >= joystickRect.left && touch.clientX <= joystickRect.right &&
+          touch.clientY >= joystickRect.top && touch.clientY <= joystickRect.bottom) {
+        return
+      }
+      if (jumpRect && touch.clientX >= jumpRect.left && touch.clientX <= jumpRect.right &&
+          touch.clientY >= jumpRect.top && touch.clientY <= jumpRect.bottom) {
+        return
+      }
+
+      const angle = Math.atan2(
+        canvasY - game.player.y - game.player.height / 2,
+        canvasX - game.player.x - game.player.width / 2
+      )
+      game.bullets.push({
+        x: game.player.x + game.player.width / 2,
+        y: game.player.y + game.player.height / 2,
+        vx: Math.cos(angle) * 8,
+        vy: Math.sin(angle) * 8
+      })
+    }
+
+    const handleCanvasTouchMove = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
+    const handleCanvasTouchEnd = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
     }
 
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
     canvas.addEventListener('click', handleClick)
+    canvas.addEventListener('touchstart', handleCanvasTouch, { passive: false })
+    canvas.addEventListener('touchmove', handleCanvasTouchMove, { passive: false })
+    canvas.addEventListener('touchend', handleCanvasTouchEnd, { passive: false })
     
-    // Mobile touch handlers
-    if (isMobileRef.current && container) {
-      container.addEventListener('touchstart', handleTouchStart, { passive: false })
-      container.addEventListener('touchmove', handleTouchMove, { passive: false })
-      container.addEventListener('touchend', handleTouchEnd, { passive: false })
+    // Also listen on document for touchmove/touchend to handle joystick when touch moves outside
+    if (isMobile) {
+      document.addEventListener('touchmove', handleTouchMove, { passive: false })
+      document.addEventListener('touchend', handleTouchEnd, { passive: false })
     }
-
-    // Collision detection
-    const checkCollision = (rect1, rect2) => {
-      return (
-        rect1.x < rect2.x + rect2.width &&
-        rect1.x + rect1.width > rect2.x &&
-        rect1.y < rect2.y + rect2.height &&
-        rect1.y + rect1.height > rect2.y
-      )
-    }
-
-    const checkPointInRect = (point, rect) => {
-      return (
-        point.x >= rect.x &&
-        point.x <= rect.x + rect.width &&
-        point.y >= rect.y &&
-        point.y <= rect.y + rect.height
-      )
-    }
-
-    // Game loop - optimized for mobile
-    let lastTime = 0
-    let enemySpawnTimer = 0
-    const targetFPS = isMobileRef.current ? 30 : 60 // Lower FPS on mobile
-    const frameInterval = 1000 / targetFPS
-
-    const gameLoop = (currentTime) => {
-      if (!gameRef.current) return
-
-      const deltaTime = currentTime - lastTime
-      
-      // Throttle to target FPS for better performance
-      if (deltaTime < frameInterval) {
-        requestAnimationFrame(gameLoop)
-        return
+    
+    // Add joystick listeners with a small delay to ensure refs are set
+    const joystickTimeout = setTimeout(() => {
+      if (joystickRef.current && isMobile) {
+        joystickRef.current.addEventListener('touchstart', handleTouchStart, { passive: false })
       }
-      
-      lastTime = currentTime - (deltaTime % frameInterval)
+    }, 100)
+    
+    // Add jump button listeners with a small delay to ensure refs are set
+    const jumpTimeout = setTimeout(() => {
+      if (jumpButtonRef.current && isMobile) {
+        jumpButtonRef.current.addEventListener('click', handleJump)
+        jumpButtonRef.current.addEventListener('touchstart', handleJump, { passive: false })
+      }
+    }, 100)
 
-      // Clear canvas
-      ctx.fillStyle = '#dadbd4'
+    // Game loop
+    const gameLoop = () => {
+      if (game.gameOver && !isPlaying) return
+
+      // Clear with light grey background
+      ctx.fillStyle = '#d3d3d3'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      // Update player - support joystick input
-      const joystickPos = joystickPositionRef.current
-      const joystickActive = isJoystickActiveRef.current
-      const moveLeft = game.keys['ArrowLeft'] || game.keys['a'] || game.keys['A'] || (joystickActive && joystickPos.x < -0.3)
-      const moveRight = game.keys['ArrowRight'] || game.keys['d'] || game.keys['D'] || (joystickActive && joystickPos.x > 0.3)
-      
-      if (moveLeft) {
-        game.player.x = Math.max(0, game.player.x - game.player.speed)
+      // Draw platforms
+      ctx.fillStyle = '#a0a0a0'
+      game.platforms.forEach(platform => {
+        ctx.fillRect(platform.x, platform.y, platform.width, platform.height)
+      })
+
+      // Update player
+      if (game.keys['ArrowLeft'] || game.keys['a'] || game.keys['A']) {
+        game.player.x -= game.player.speed
       }
-      if (moveRight) {
-        game.player.x = Math.min(canvas.width - game.player.width, game.player.x + game.player.speed)
+      if (game.keys['ArrowRight'] || game.keys['d'] || game.keys['D']) {
+        game.player.x += game.player.speed
       }
 
-      // Apply gravity
-      game.player.velocityY += 0.6
+      // Mobile joystick movement
+      if (isJoystickActive && joystickPositionRef.current.x !== 0) {
+        game.player.x += joystickPositionRef.current.x * 0.15
+      }
+
+      // Gravity and jumping
+      game.player.velocityY += 0.5
       game.player.y += game.player.velocityY
 
       // Platform collision
       game.player.onGround = false
-      for (const platform of game.platforms) {
+      game.platforms.forEach(platform => {
         if (
           game.player.x < platform.x + platform.width &&
           game.player.x + game.player.width > platform.x &&
-          game.player.y + game.player.height > platform.y &&
-          game.player.y + game.player.height < platform.y + platform.height &&
-          game.player.velocityY > 0
+          game.player.y < platform.y + platform.height &&
+          game.player.y + game.player.height > platform.y
         ) {
-          game.player.y = platform.y - game.player.height
-          game.player.velocityY = 0
-          game.player.onGround = true
+          if (game.player.velocityY > 0) {
+            game.player.y = platform.y - game.player.height
+            game.player.velocityY = 0
+            game.player.onGround = true
+          }
         }
-      }
+      })
 
       // Keep player in bounds
-      if (game.player.y > canvas.height) {
-        game.player.y = 300
-        game.player.velocityY = 0
-        game.player.onGround = true
-      }
+      game.player.x = Math.max(0, Math.min(canvas.width - game.player.width, game.player.x))
+      game.player.y = Math.max(0, Math.min(canvas.height - game.player.height, game.player.y))
+
+      // Update bullets
+      game.bullets = game.bullets.filter(bullet => {
+        bullet.x += bullet.vx
+        bullet.y += bullet.vy
+        return bullet.x > 0 && bullet.x < canvas.width && bullet.y > 0 && bullet.y < canvas.height
+      })
 
       // Spawn enemies
-      enemySpawnTimer += deltaTime
-      if (enemySpawnTimer > 2000 && !game.gameOver) {
+      if (Math.random() < 0.02) {
         game.enemies.push({
           x: canvas.width,
           y: Math.random() * (canvas.height - 50),
           width: 30,
           height: 30,
-          speed: 2 + Math.random() * 2,
-          emoji: '👻'
+          speed: 2 + Math.random() * 2
         })
-        enemySpawnTimer = 0
       }
 
       // Update enemies
       game.enemies = game.enemies.filter(enemy => {
         enemy.x -= enemy.speed
 
-        // Check collision with player
-        if (checkCollision(game.player, enemy)) {
-          game.gameOver = true
-          setIsPlaying(false)
-        }
-
-        return enemy.x > -enemy.width
-      })
-
-      // Update bullets
-      game.bullets = game.bullets.filter(bullet => {
-        bullet.x += bullet.vx
-        bullet.y += bullet.vy
-
-        // Check collision with enemies
-        for (let i = game.enemies.length - 1; i >= 0; i--) {
-          const enemy = game.enemies[i]
+        // Bullet collision
+        for (let i = game.bullets.length - 1; i >= 0; i--) {
+          const bullet = game.bullets[i]
           if (
-            bullet.x >= enemy.x &&
-            bullet.x <= enemy.x + enemy.width &&
-            bullet.y >= enemy.y &&
-            bullet.y <= enemy.y + enemy.height
+            bullet.x > enemy.x &&
+            bullet.x < enemy.x + enemy.width &&
+            bullet.y > enemy.y &&
+            bullet.y < enemy.y + enemy.height
           ) {
-            game.enemies.splice(i, 1)
-            game.score += 10
+            game.bullets.splice(i, 1)
+            game.score++
             return false
           }
         }
 
-        return (
-          bullet.x > 0 &&
-          bullet.x < canvas.width &&
-          bullet.y > 0 &&
-          bullet.y < canvas.height
-        )
+        // Player collision
+        if (
+          game.player.x < enemy.x + enemy.width &&
+          game.player.x + game.player.width > enemy.x &&
+          game.player.y < enemy.y + enemy.height &&
+          game.player.y + game.player.height > enemy.y
+        ) {
+          game.gameOver = true
+          setIsPlaying(false)
+        }
+
+        return enemy.x > -50
       })
 
-      // Draw platforms
-      ctx.fillStyle = '#9ca3af'
-      ctx.strokeStyle = '#6b7280'
-      ctx.lineWidth = 2
-      game.platforms.forEach(platform => {
-        ctx.fillRect(platform.x, platform.y, platform.width, platform.height)
-        ctx.strokeRect(platform.x, platform.y, platform.width, platform.height)
-      })
-
-      // Draw player (gun emoji)
-      ctx.font = `${game.player.height}px Arial`
+      // Draw player
+      ctx.font = '30px Arial'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.fillText(
-        game.player.emoji,
-        game.player.x + game.player.width / 2,
-        game.player.y + game.player.height / 2
-      )
+      ctx.fillText(game.player.emoji, game.player.x + game.player.width / 2, game.player.y + game.player.height / 2)
 
       // Draw bullets
-      ctx.fillStyle = '#000000'
+      ctx.fillStyle = '#ffff00'
       game.bullets.forEach(bullet => {
         ctx.beginPath()
-        ctx.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2)
+        ctx.arc(bullet.x, bullet.y, 4, 0, Math.PI * 2)
         ctx.fill()
       })
 
-      // Draw enemies (ghost emoji with red outline)
+      // Draw enemies
       game.enemies.forEach(enemy => {
-        ctx.font = `${enemy.height}px Arial`
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        
-        const centerX = enemy.x + enemy.width / 2
-        const centerY = enemy.y + enemy.height / 2
-        
-        // Draw red outline by drawing emoji multiple times with offsets
-        // Create a glow effect by drawing in a circle pattern
-        const outlineRadius = 2.5
-        const numPoints = 16
-        for (let i = 0; i < numPoints; i++) {
-          const angle = (i / numPoints) * Math.PI * 2
-          const dx = Math.cos(angle) * outlineRadius
-          const dy = Math.sin(angle) * outlineRadius
-          ctx.fillText(enemy.emoji, centerX + dx, centerY + dy)
-        }
-        
-        // Draw additional outline points for thicker effect
-        for (let i = 0; i < numPoints; i++) {
-          const angle = (i / numPoints) * Math.PI * 2
-          const dx = Math.cos(angle) * (outlineRadius * 0.7)
-          const dy = Math.sin(angle) * (outlineRadius * 0.7)
-          ctx.fillText(enemy.emoji, centerX + dx, centerY + dy)
-        }
-        
-        // Draw red circle behind for better visibility
-        ctx.strokeStyle = '#dc2626'
-        ctx.lineWidth = 2
-        ctx.beginPath()
-        ctx.arc(centerX, centerY, enemy.width / 2 + 2, 0, Math.PI * 2)
-        ctx.stroke()
-        
-        // Draw the ghost emoji on top
-        ctx.fillText(enemy.emoji, centerX, centerY)
+        // Draw ghost emoji with red outline
+        ctx.font = '25px Arial'
+        ctx.strokeStyle = '#ff0000'
+        ctx.lineWidth = 3
+        ctx.strokeText('👻', enemy.x + enemy.width / 2, enemy.y + enemy.height / 2)
+        ctx.fillText('👻', enemy.x + enemy.width / 2, enemy.y + enemy.height / 2)
       })
 
-      // Draw UI
-      ctx.font = 'bold 18px Inter, sans-serif'
+      // Draw score
+      ctx.fillStyle = '#000000'
+      ctx.font = 'bold 20px Inter, sans-serif'
       ctx.textAlign = 'left'
       ctx.textBaseline = 'top'
-      
-      // Draw background for score text
-      const scoreText = `Score: ${game.score}`
-      const textMetrics = ctx.measureText(scoreText)
-      const textWidth = textMetrics.width
-      const textHeight = 20
-      const padding = 8
-      
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
-      ctx.fillRect(10, 10, textWidth + padding * 2, textHeight + padding)
-      
-      ctx.fillStyle = '#1a1a1a'
-      ctx.fillText(scoreText, 10 + padding, 10 + padding)
+      ctx.fillRect(10, 10, 120, 30)
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(`Score: ${game.score}`, 20, 15)
 
+      // Draw game over
       if (game.gameOver) {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
         ctx.fillStyle = '#ffffff'
         ctx.font = 'bold 32px Inter, sans-serif'
         ctx.textAlign = 'center'
-        ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 20)
+        ctx.fillText('Game Over!', canvas.width / 2, canvas.height / 2 - 20)
         ctx.font = '18px Inter, sans-serif'
-        ctx.fillText(`Final Score: ${game.score}`, canvas.width / 2, canvas.height / 2 + 20)
-        const restartText = isMobileRef.current ? 'Tap to Restart' : 'Click to Restart'
-        ctx.fillText(restartText, canvas.width / 2, canvas.height / 2 + 50)
-        ctx.textAlign = 'left'
-      } else {
-        ctx.fillStyle = '#666666'
-        ctx.font = '14px Inter, sans-serif'
-        const instructionText = isMobileRef.current 
-          ? 'Tap to Shoot | Use Joystick to Move' 
-          : 'Click to Shoot | Arrow Keys to Move'
-        ctx.fillText(instructionText, 10, canvas.height - 10)
+        ctx.fillText('Click or Tap to Restart', canvas.width / 2, canvas.height / 2 + 20)
       }
 
-      requestAnimationFrame(gameLoop)
+      // Throttle FPS
+      const fps = mobile ? 30 : 60
+      gameRef.current.animationId = setTimeout(() => {
+        requestAnimationFrame(gameLoop)
+      }, 1000 / fps)
     }
 
+    // Start game automatically
     setIsPlaying(true)
-    const animationId = requestAnimationFrame(gameLoop)
-    gameRef.current.animationId = animationId
+    gameLoop()
 
     return () => {
-      // Cancel animation frame
-      if (gameRef.current?.animationId) {
-        cancelAnimationFrame(gameRef.current.animationId)
-      }
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
       canvas.removeEventListener('click', handleClick)
-      if (isMobileRef.current && container) {
-        container.removeEventListener('touchstart', handleTouchStart)
-        container.removeEventListener('touchmove', handleTouchMove)
-        container.removeEventListener('touchend', handleTouchEnd)
+      canvas.removeEventListener('touchstart', handleCanvasTouch)
+      canvas.removeEventListener('touchmove', handleCanvasTouchMove)
+      canvas.removeEventListener('touchend', handleCanvasTouchEnd)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
+      if (joystickRef.current) {
+        joystickRef.current.removeEventListener('touchstart', handleTouchStart)
       }
-      gameRef.current = null
+      if (jumpButtonRef.current) {
+        jumpButtonRef.current.removeEventListener('click', handleJump)
+        jumpButtonRef.current.removeEventListener('touchstart', handleJump)
+      }
+      if (gameRef.current?.animationId) {
+        clearTimeout(gameRef.current.animationId)
+      }
+      clearTimeout(joystickTimeout)
+      clearTimeout(jumpTimeout)
     }
-  }, [isMobile])
+  }, [isPlaying, isMobile, isJoystickActive])
 
   return (
     <div className="shooter-game-container">
-      <canvas ref={canvasRef} className="shooter-game-canvas"></canvas>
-      <div className="mobile-controls">
-        <div className="joystick-container">
-          <div ref={joystickRef} className="joystick-base">
-            <div ref={joystickStickRef} className="joystick-stick"></div>
+      <canvas
+        ref={canvasRef}
+        className="shooter-game-canvas"
+      />
+      {isMobile && (
+        <div className="mobile-controls">
+          <div className="joystick-container">
+            <div
+              ref={joystickRef}
+              className="joystick-base"
+              onTouchStart={(e) => {
+                e.stopPropagation()
+                handleTouchStart(e)
+              }}
+            >
+              <div
+                ref={joystickStickRef}
+                className="joystick-stick"
+                style={{
+                  transform: `translate(${joystickPosition.x}px, ${joystickPosition.y}px)`
+                }}
+              />
+            </div>
           </div>
+          <button
+            ref={jumpButtonRef}
+            className="jump-button"
+            aria-label="Jump"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleJump(e)
+            }}
+            onTouchStart={(e) => {
+              e.stopPropagation()
+              handleJump(e)
+            }}
+            type="button"
+          >
+            JUMP
+          </button>
         </div>
-        <button 
-          ref={jumpButtonRef}
-          className="jump-button"
-        >
-          JUMP
-        </button>
-      </div>
+      )}
     </div>
   )
 }

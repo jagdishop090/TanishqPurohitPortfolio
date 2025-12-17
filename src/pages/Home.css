@@ -128,14 +128,42 @@
   }
 }
 
-/* Disable border animation on mobile */
+/* Keep border animation on mobile */
 @media (max-width: 768px) {
   .home-cta-border-svg {
-    display: none;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 10;
   }
   
   .home-button-border-path {
-    animation: none !important;
+    stroke-width: 3px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  
+  .home-button-border-path.path-1,
+  .home-button-border-path.path-2,
+  .home-button-border-path.path-3,
+  .home-button-border-path.path-4 {
+    animation-play-state: running !important;
+    animation: drawHomeButtonBorder 7s linear infinite !important;
+  }
+  
+  .home-button-border-path.path-2 {
+    animation: drawHomeButtonBorder 8s linear infinite !important;
+    animation-delay: 1.5s !important;
+  }
+  
+  .home-button-border-path.path-3 {
+    animation: drawHomeButtonBorder 9s linear infinite !important;
+    animation-delay: 3s !important;
+  }
+  
+  .home-button-border-path.path-4 {
+    animation: drawHomeButtonBorder 10s linear infinite !important;
+    animation-delay: 0.5s !important;
   }
 }
 

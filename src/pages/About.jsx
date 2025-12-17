@@ -1,10 +1,46 @@
 import { motion } from 'framer-motion'
+import { useEffect } from 'react'
 import ShooterGame from '../components/ShooterGame'
 import './About.css'
 
 const About = ({ isAnimated, onNavigate }) => {
   // Simplified animations for mobile
   const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+  
+  // Only prevent navigation for game elements, not all clicks
+  useEffect(() => {
+    const handleClick = (e) => {
+      // Only prevent navigation if click is specifically on game elements
+      const gameContainer = e.target.closest('.shooter-game-container')
+      const mobileControls = e.target.closest('.mobile-controls')
+      const joystick = e.target.closest('.joystick-base')
+      const jumpButton = e.target.closest('.jump-button')
+      const canvas = e.target.closest('.shooter-game-canvas')
+      
+      // Only stop navigation for game-related elements
+      if (gameContainer || mobileControls || joystick || jumpButton || canvas) {
+        // Don't prevent default for buttons/links inside game
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A') {
+          return
+        }
+        // Only prevent hash navigation, not all clicks
+        if (e.target.tagName === 'A' && e.target.getAttribute('href')?.startsWith('#')) {
+          const href = e.target.getAttribute('href')
+          // Allow navigation to contact page from Contact Me button
+          if (href === '#contact') {
+            return
+          }
+        }
+      }
+    }
+    
+    // Use capture phase but don't block everything
+    document.addEventListener('click', handleClick, true)
+    
+    return () => {
+      document.removeEventListener('click', handleClick, true)
+    }
+  }, [])
   
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -212,7 +248,13 @@ const About = ({ isAnimated, onNavigate }) => {
                 </div>
               </div>
             </div>
-            <div className="process-image">
+            <div 
+              className="process-image"
+              onClick={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
+            >
               <ShooterGame />
             </div>
           </div>

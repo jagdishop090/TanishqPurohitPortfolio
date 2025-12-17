@@ -54,7 +54,32 @@ function App() {
     setNextPath(sectionId)
   }
 
-  const scrollToSection = useCallback((sectionId) => {
+  const scrollToSection = useCallback((sectionId, event) => {
+    // Only prevent navigation if event originated from game canvas or controls
+    if (event) {
+      const target = event.target || event.touches?.[0]?.target
+      if (target) {
+        const gameContainer = target.closest('.shooter-game-container')
+        const mobileControls = target.closest('.mobile-controls')
+        const joystick = target.closest('.joystick-base')
+        const jumpButton = target.closest('.jump-button')
+        const canvas = target.closest('.shooter-game-canvas')
+        
+        // Only prevent if it's specifically game elements, not buttons/links
+        if ((gameContainer || mobileControls || joystick || canvas) && 
+            target.tagName !== 'BUTTON' && 
+            target.tagName !== 'A' && 
+            !target.closest('button') && 
+            !target.closest('a')) {
+          return
+        }
+        // Always allow jump button to work
+        if (jumpButton) {
+          return
+        }
+      }
+    }
+    
     const element = sectionsRef.current[sectionId]
     if (element) {
       // Trigger stair animation

@@ -277,10 +277,12 @@
   padding: 5rem 2rem 2rem;
   overflow-y: auto;
   transform: translateX(100%);
+  pointer-events: none;
 }
 
 .mobile-menu.open {
   transform: translateX(0);
+  pointer-events: auto;
 }
 
 .mobile-nav {
@@ -342,6 +344,7 @@
   background: rgba(0, 0, 0, 0.8);
   z-index: 999;
   animation: fadeIn 0.3s ease;
+  pointer-events: auto;
 }
 
 @keyframes fadeIn {

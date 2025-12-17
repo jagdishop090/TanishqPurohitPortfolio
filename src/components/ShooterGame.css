@@ -8,6 +8,8 @@
   overflow: visible;
   background: transparent;
   position: relative;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .shooter-game-canvas {
@@ -49,7 +51,7 @@
   height: 100px;
   border-radius: 50%;
   background: rgba(26, 26, 26, 0.95);
-  border: 2px solid var(--text-dark);
+  border: 2px solid #ffffff;
   position: relative;
   display: flex;
   align-items: center;
@@ -63,7 +65,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--text-dark);
+  background: #ffffff;
   position: absolute;
   transition: transform 0.1s ease-out;
   box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
@@ -75,8 +77,8 @@
   height: 80px;
   border-radius: 50%;
   background: rgba(26, 26, 26, 0.95);
-  border: 2px solid var(--text-dark);
-  color: var(--text-dark);
+  border: 2px solid #ffffff;
+  color: #ffffff;
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -93,7 +95,7 @@
 
 .jump-button:active {
   transform: scale(0.95);
-  background: var(--text-dark);
+  background: #ffffff;
   color: #000000;
 }
 

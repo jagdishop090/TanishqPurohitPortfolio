@@ -29,7 +29,8 @@ const Header = ({ activeSection, onNavigate }) => {
 
   const handleClick = (e, sectionId) => {
     e.preventDefault()
-    onNavigate(sectionId)
+    e.stopPropagation()
+    onNavigate(sectionId, e)
     setIsMobileMenuOpen(false)
   }
 
@@ -99,17 +100,27 @@ const Header = ({ activeSection, onNavigate }) => {
         initial={false}
         animate={{ 
           opacity: isMobileMenuOpen ? 1 : 0,
-          x: isMobileMenuOpen ? 0 : '100%'
+          x: isMobileMenuOpen ? 0 : '100%',
+          pointerEvents: isMobileMenuOpen ? 'auto' : 'none'
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
+        style={{ pointerEvents: isMobileMenuOpen ? 'auto' : 'none' }}
       >
         <nav className="mobile-nav">
           {navItems.map((item) => (
             <a
               key={item.id}
               href={`#${item.id}`}
-              onClick={(e) => handleClick(e, item.id)}
+              onClick={(e) => {
+                if (!isMobileMenuOpen) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  return
+                }
+                handleClick(e, item.id)
+              }}
               className={`mobile-nav-item ${activeSection === item.id ? 'active' : ''}`}
+              style={{ pointerEvents: isMobileMenuOpen ? 'auto' : 'none' }}
             >
               {item.label}
             </a>
@@ -117,7 +128,15 @@ const Header = ({ activeSection, onNavigate }) => {
           <a 
             href="#contact" 
             className="mobile-contact-btn" 
-            onClick={(e) => handleClick(e, 'contact')}
+            onClick={(e) => {
+              if (!isMobileMenuOpen) {
+                e.preventDefault()
+                e.stopPropagation()
+                return
+              }
+              handleClick(e, 'contact')
+            }}
+            style={{ pointerEvents: isMobileMenuOpen ? 'auto' : 'none' }}
           >
             CONTACT
           </a>

@@ -40,35 +40,40 @@
   justify-content: space-between;
 }
 
-.joystick-container {
-  position: relative;
+.movement-buttons {
+  display: flex;
+  gap: 15px;
   pointer-events: auto;
   z-index: 1001;
 }
 
-.joystick-base {
-  width: 100px;
-  height: 100px;
+.move-button {
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   background: rgba(26, 26, 26, 0.95);
   border: 2px solid #ffffff;
-  position: relative;
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 1001;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
-  touch-action: none;
   user-select: none;
 }
 
-.joystick-stick {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.move-button:active {
+  transform: scale(0.9);
   background: #ffffff;
-  position: absolute;
-  transition: transform 0.1s ease-out;
-  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+  color: #000000;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.5);
 }
 
 .jump-button {

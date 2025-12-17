@@ -5,13 +5,12 @@ const ShooterGame = () => {
   const canvasRef = useRef(null)
   const gameRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(true)
-  const joystickRef = useRef(null)
-  const joystickStickRef = useRef(null)
+  const leftButtonRef = useRef(null)
+  const rightButtonRef = useRef(null)
   const jumpButtonRef = useRef(null)
   const [isMobile, setIsMobile] = useState(false)
-  const joystickPositionRef = useRef({ x: 0, y: 0 })
-  const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 })
-  const [isJoystickActive, setIsJoystickActive] = useState(false)
+  const [isMovingLeft, setIsMovingLeft] = useState(false)
+  const [isMovingRight, setIsMovingRight] = useState(false)
 
   useEffect(() => {
     // Check if mobile device
@@ -37,7 +36,7 @@ const ShooterGame = () => {
         width: 35,
         height: 35,
         speed: 5,
-        jumpPower: 18,
+        jumpPower: 14,
         velocityY: 0,
         onGround: false,
         emoji: '🐸'
@@ -61,11 +60,8 @@ const ShooterGame = () => {
     // Input handling
     const handleKeyDown = (e) => {
       game.keys[e.key] = true
-      if (e.key === ' ' && game.player.onGround) {
-        game.player.velocityY = -game.player.jumpPower
-        game.player.onGround = false
-      }
-      if (e.key === 'ArrowUp' && game.player.onGround) {
+      // Allow jump if on ground or very close to ground (small buffer for better feel)
+      if ((e.key === ' ' || e.key === 'ArrowUp') && (game.player.onGround || game.player.velocityY <= 1)) {
         game.player.velocityY = -game.player.jumpPower
         game.player.onGround = false
       }
@@ -112,69 +108,37 @@ const ShooterGame = () => {
       })
     }
 
-    // Joystick handling
-    const handleTouchStart = (e) => {
-      e.preventDefault()
-      e.stopPropagation()
-      if (game.gameOver) {
-        game.player.x = 50
-        game.player.y = 300
-        game.player.velocityY = 0
-        game.bullets = []
-        game.enemies = []
-        game.score = 0
-        game.gameOver = false
-        setIsPlaying(true)
-        return
-      }
-
-      if (!joystickRef.current) return
-      const touch = e.touches[0]
-      const rect = joystickRef.current.getBoundingClientRect()
-      const centerX = rect.left + rect.width / 2
-      const centerY = rect.top + rect.height / 2
-      const touchX = touch.clientX - centerX
-      const touchY = touch.clientY - centerY
-      
-      setIsJoystickActive(true)
-      joystickPositionRef.current = { x: touchX, y: touchY }
-      setJoystickPosition({ x: touchX, y: touchY })
-    }
-
-    const handleTouchMove = (e) => {
-      if (!isJoystickActive || !joystickRef.current) return
-      e.preventDefault()
-      e.stopPropagation()
-      const touch = e.touches[0]
-      const rect = joystickRef.current.getBoundingClientRect()
-      const centerX = rect.left + rect.width / 2
-      const centerY = rect.top + rect.height / 2
-      const touchX = touch.clientX - centerX
-      const touchY = touch.clientY - centerY
-      const distance = Math.sqrt(touchX * touchX + touchY * touchY)
-      const maxDistance = 40
-      
-      if (distance > maxDistance) {
-        const angle = Math.atan2(touchY, touchX)
-        joystickPositionRef.current = {
-          x: Math.cos(angle) * maxDistance,
-          y: Math.sin(angle) * maxDistance
-        }
-      } else {
-        joystickPositionRef.current = { x: touchX, y: touchY }
-      }
-      // Update immediately for better responsiveness
-      setJoystickPosition({ ...joystickPositionRef.current })
-    }
-
-    const handleTouchEnd = (e) => {
+    // Mobile button handlers
+    const handleLeftPress = (e) => {
       if (e) {
         e.preventDefault()
         e.stopPropagation()
       }
-      setIsJoystickActive(false)
-      joystickPositionRef.current = { x: 0, y: 0 }
-      setJoystickPosition({ x: 0, y: 0 })
+      setIsMovingLeft(true)
+    }
+
+    const handleLeftRelease = (e) => {
+      if (e) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+      setIsMovingLeft(false)
+    }
+
+    const handleRightPress = (e) => {
+      if (e) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+      setIsMovingRight(true)
+    }
+
+    const handleRightRelease = (e) => {
+      if (e) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+      setIsMovingRight(false)
     }
 
     const handleJump = (e) => {
@@ -182,7 +146,8 @@ const ShooterGame = () => {
         e.preventDefault()
         e.stopPropagation()
       }
-      if (game.player.onGround) {
+      // Allow jump if on ground or very close to ground (small buffer for better feel)
+      if (game.player.onGround || game.player.velocityY <= 1) {
         game.player.velocityY = -game.player.jumpPower
         game.player.onGround = false
       }
@@ -217,11 +182,16 @@ const ShooterGame = () => {
       const canvasX = (touch.clientX - rect.left) * scaleX
       const canvasY = (touch.clientY - rect.top) * scaleY
 
-      // Don't shoot if touching joystick or jump button area
-      const joystickRect = joystickRef.current?.getBoundingClientRect()
+      // Don't shoot if touching movement buttons or jump button area
+      const leftRect = leftButtonRef.current?.getBoundingClientRect()
+      const rightRect = rightButtonRef.current?.getBoundingClientRect()
       const jumpRect = jumpButtonRef.current?.getBoundingClientRect()
-      if (joystickRect && touch.clientX >= joystickRect.left && touch.clientX <= joystickRect.right &&
-          touch.clientY >= joystickRect.top && touch.clientY <= joystickRect.bottom) {
+      if (leftRect && touch.clientX >= leftRect.left && touch.clientX <= leftRect.right &&
+          touch.clientY >= leftRect.top && touch.clientY <= leftRect.bottom) {
+        return
+      }
+      if (rightRect && touch.clientX >= rightRect.left && touch.clientX <= rightRect.right &&
+          touch.clientY >= rightRect.top && touch.clientY <= rightRect.bottom) {
         return
       }
       if (jumpRect && touch.clientX >= jumpRect.left && touch.clientX <= jumpRect.right &&
@@ -264,18 +234,23 @@ const ShooterGame = () => {
       document.addEventListener('touchend', handleTouchEnd, { passive: false })
     }
     
-    // Add joystick listeners with a small delay to ensure refs are set
-    const joystickTimeout = setTimeout(() => {
-      if (joystickRef.current && isMobile) {
-        joystickRef.current.addEventListener('touchstart', handleTouchStart, { passive: false })
-      }
-    }, 100)
-    
-    // Add jump button listeners with a small delay to ensure refs are set
-    const jumpTimeout = setTimeout(() => {
-      if (jumpButtonRef.current && isMobile) {
-        jumpButtonRef.current.addEventListener('click', handleJump)
-        jumpButtonRef.current.addEventListener('touchstart', handleJump, { passive: false })
+    // Add mobile button listeners with a small delay to ensure refs are set
+    const buttonTimeout = setTimeout(() => {
+      if (isMobile) {
+        if (leftButtonRef.current) {
+          leftButtonRef.current.addEventListener('touchstart', handleLeftPress, { passive: false })
+          leftButtonRef.current.addEventListener('touchend', handleLeftRelease, { passive: false })
+          leftButtonRef.current.addEventListener('touchcancel', handleLeftRelease, { passive: false })
+        }
+        if (rightButtonRef.current) {
+          rightButtonRef.current.addEventListener('touchstart', handleRightPress, { passive: false })
+          rightButtonRef.current.addEventListener('touchend', handleRightRelease, { passive: false })
+          rightButtonRef.current.addEventListener('touchcancel', handleRightRelease, { passive: false })
+        }
+        if (jumpButtonRef.current) {
+          jumpButtonRef.current.addEventListener('click', handleJump)
+          jumpButtonRef.current.addEventListener('touchstart', handleJump, { passive: false })
+        }
       }
     }, 100)
 
@@ -301,13 +276,16 @@ const ShooterGame = () => {
         game.player.x += game.player.speed
       }
 
-      // Mobile joystick movement - increased responsiveness
-      if (isJoystickActive && joystickPositionRef.current.x !== 0) {
-        game.player.x += joystickPositionRef.current.x * 0.25
+      // Mobile button movement
+      if (isMovingLeft) {
+        game.player.x -= game.player.speed
+      }
+      if (isMovingRight) {
+        game.player.x += game.player.speed
       }
 
-      // Gravity and jumping - reduced gravity for better feel
-      game.player.velocityY += 0.4
+      // Gravity and jumping - balanced gravity
+      game.player.velocityY += 0.6
       game.player.y += game.player.velocityY
 
       // Platform collision
@@ -327,9 +305,20 @@ const ShooterGame = () => {
         }
       })
 
-      // Keep player in bounds
+      // Keep player in bounds horizontally
       game.player.x = Math.max(0, Math.min(canvas.width - game.player.width, game.player.x))
-      game.player.y = Math.max(0, Math.min(canvas.height - game.player.height, game.player.y))
+      
+      // Check if player fell off the screen - death by falling
+      if (game.player.y > canvas.height) {
+        game.gameOver = true
+        setIsPlaying(false)
+      }
+      
+      // Keep player from going above screen
+      if (game.player.y < 0) {
+        game.player.y = 0
+        game.player.velocityY = 0
+      }
 
       // Update bullets
       game.bullets = game.bullets.filter(bullet => {
@@ -447,10 +436,15 @@ const ShooterGame = () => {
       canvas.removeEventListener('touchstart', handleCanvasTouch)
       canvas.removeEventListener('touchmove', handleCanvasTouchMove)
       canvas.removeEventListener('touchend', handleCanvasTouchEnd)
-      document.removeEventListener('touchmove', handleTouchMove)
-      document.removeEventListener('touchend', handleTouchEnd)
-      if (joystickRef.current) {
-        joystickRef.current.removeEventListener('touchstart', handleTouchStart)
+      if (leftButtonRef.current) {
+        leftButtonRef.current.removeEventListener('touchstart', handleLeftPress)
+        leftButtonRef.current.removeEventListener('touchend', handleLeftRelease)
+        leftButtonRef.current.removeEventListener('touchcancel', handleLeftRelease)
+      }
+      if (rightButtonRef.current) {
+        rightButtonRef.current.removeEventListener('touchstart', handleRightPress)
+        rightButtonRef.current.removeEventListener('touchend', handleRightRelease)
+        rightButtonRef.current.removeEventListener('touchcancel', handleRightRelease)
       }
       if (jumpButtonRef.current) {
         jumpButtonRef.current.removeEventListener('click', handleJump)
@@ -459,10 +453,9 @@ const ShooterGame = () => {
       if (gameRef.current?.animationId) {
         cancelAnimationFrame(gameRef.current.animationId)
       }
-      if (joystickTimeout) clearTimeout(joystickTimeout)
-      if (jumpTimeout) clearTimeout(jumpTimeout)
+      if (buttonTimeout) clearTimeout(buttonTimeout)
     }
-  }, [isPlaying, isMobile, isJoystickActive])
+  }, [isPlaying, isMobile, isMovingLeft, isMovingRight])
 
   return (
     <div className="shooter-game-container">
@@ -472,23 +465,47 @@ const ShooterGame = () => {
       />
       {isMobile && (
         <div className="mobile-controls">
-          <div className="joystick-container">
-            <div
-              ref={joystickRef}
-              className="joystick-base"
+          <div className="movement-buttons">
+            <button
+              ref={leftButtonRef}
+              className="move-button move-left"
+              aria-label="Move Left"
               onTouchStart={(e) => {
                 e.stopPropagation()
-                handleTouchStart(e)
+                handleLeftPress(e)
               }}
+              onTouchEnd={(e) => {
+                e.stopPropagation()
+                handleLeftRelease(e)
+              }}
+              onTouchCancel={(e) => {
+                e.stopPropagation()
+                handleLeftRelease(e)
+              }}
+              type="button"
             >
-              <div
-                ref={joystickStickRef}
-                className="joystick-stick"
-                style={{
-                  transform: `translate(${joystickPosition.x}px, ${joystickPosition.y}px)`
-                }}
-              />
-            </div>
+              ←
+            </button>
+            <button
+              ref={rightButtonRef}
+              className="move-button move-right"
+              aria-label="Move Right"
+              onTouchStart={(e) => {
+                e.stopPropagation()
+                handleRightPress(e)
+              }}
+              onTouchEnd={(e) => {
+                e.stopPropagation()
+                handleRightRelease(e)
+              }}
+              onTouchCancel={(e) => {
+                e.stopPropagation()
+                handleRightRelease(e)
+              }}
+              type="button"
+            >
+              →
+            </button>
           </div>
           <button
             ref={jumpButtonRef}
